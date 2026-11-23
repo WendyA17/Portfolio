@@ -1,0 +1,33 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import Phase from '../components/Phase.astro';
+
+// Les 8 phases du portfolio, dans l'ordre du cycle lunaire.
+// Pour l'instant chaque section n'affiche que son titre :
+// on les remplira une par une.
+const phases = [
+  { id: 'accueil', lune: 'Nouvelle lune', titre: 'Accueil' },
+  { id: 'histoire', lune: 'Premier croissant', titre: 'Mon histoire' },
+  { id: 'competences', lune: 'Premier quartier', titre: 'Compétences' },
+  { id: 'projets', lune: 'Gibbeuse croissante', titre: 'Projets' },
+  { id: 'etude', lune: 'Pleine lune', titre: 'Étude de cas' },
+  { id: 'parcours', lune: 'Gibbeuse décroissante', titre: 'Parcours' },
+  { id: 'contact', lune: 'Dernier quartier', titre: 'Contact' },
+  { id: 'fin', lune: 'Dernier croissant', titre: 'Fin du cycle' },
+];
+---
+
+<Layout snap>
+  <Header />
+
+  <main>
+    {
+      phases.map((phase, index) => (
+        <Phase id={phase.id} numero={index + 1} lune={phase.lune}>
+          <h2 class="font-serif text-5xl md:text-7xl">{phase.titre}</h2>
+        </Phase>
+      ))
+    }
+  </main>
+</Layout>

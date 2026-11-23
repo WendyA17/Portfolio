@@ -1,0 +1,44 @@
+---
+// 1. LE « FRONTMATTER » (entre les deux ---)
+// C'est du JavaScript/TypeScript qui s'exécute AVANT d'afficher la page,
+// sur ton ordinateur (ou sur le serveur), jamais dans le navigateur du visiteur.
+
+// Les « props » : les informations que la page donne au composant,
+// comme des paramètres. On décrit leur forme ici :
+interface Props {
+  titre: string;
+  annee: number;
+  techno?: string; // le « ? » veut dire : facultatif
+}
+
+const { titre, annee, techno = 'HTML & CSS' } = Astro.props;
+---
+
+<!-- 2. LE GABARIT : du HTML, avec des {accolades} pour afficher des variables -->
+<article class="carte">
+  <h3>{titre}</h3>
+  <p class="meta">{annee} — {techno}</p>
+
+  <!-- <slot /> = l'endroit où s'affiche ce qu'on met ENTRE <Carte> et </Carte> -->
+  <slot />
+</article>
+
+<!-- 3. LE STYLE : il ne s'applique QU'À ce composant (même si on écrit juste « h3 ») -->
+<style>
+  .carte {
+    background: #252039;
+    border: 1px solid #49365f;
+    border-radius: 0.5rem;
+    padding: 1.5rem;
+  }
+  h3 {
+    font-family: 'EB Garamond Variable', Georgia, serif;
+    font-size: 1.5rem;
+    margin-bottom: 0.25rem;
+  }
+  .meta {
+    color: #b8a9cb;
+    font-size: 0.875rem;
+    margin-bottom: 1rem;
+  }
+</style>

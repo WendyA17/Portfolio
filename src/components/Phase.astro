@@ -1,0 +1,27 @@
+---
+// Une « phase » = une section plein écran du portfolio
+interface Props {
+  id: string;      // l'ancre de la section, ex. « projets » → monsite.fr/#projets
+  numero: number;  // 1 à 8
+  lune: string;    // le nom de la phase lunaire
+}
+
+const { id, numero, lune } = Astro.props;
+const numeroAffiche = String(numero).padStart(2, '0'); // 1 → « 01 »
+---
+
+<section
+  id={id}
+  class="relative flex min-h-dvh snap-start flex-col px-5 pt-28 pb-12 md:px-12"
+>
+  <!-- Repère de la phase, en haut à gauche -->
+  <p class="text-sm text-lavande-claire">
+    <span class="font-serif text-lg italic">{numeroAffiche}</span>
+    <span class="ml-2">{lune}</span>
+  </p>
+
+  <!-- Le contenu de la section -->
+  <div class="flex flex-1 flex-col items-center justify-center text-center">
+    <slot />
+  </div>
+</section>

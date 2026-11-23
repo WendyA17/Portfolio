@@ -1,0 +1,74 @@
+@import "tailwindcss";
+/* ------------------------------------------------------------
+   Design system « Portfolio Céleste »
+   Chaque variable --color-xxx crée les classes bg-xxx, text-xxx,
+   border-xxx… (ex. --color-lune → text-lune, bg-lune).
+   ------------------------------------------------------------ */
+@theme {
+  /* Couleurs */
+  --color-nuit-profonde: #0e0c1a; /* le plus sombre, fonds de champs */
+  --color-nuit: #151321;          /* Noir Lunaire : fond du site */
+  --color-surface: #252039;       /* Bleu Nuit Violet : cartes, header */
+  --color-surface-haute: #2a2440; /* modales, menus flottants */
+  --color-bordure: #49365f;       /* Violet Profond : bordures, badges */
+  --color-lavande: #78618f;       /* Lavande Foncée : boutons principaux */
+  --color-lavande-vive: #8a71a3;  /* survol des boutons principaux */
+  --color-lavande-claire: #b8a9cb;/* textes secondaires */
+  --color-argent: #d1c4e9;        /* lueur argentée des survols */
+  --color-lune: #f8f7fc;          /* Blanc Lunaire : titres, texte principal */
+
+  /* Polices */
+  --font-serif: "EB Garamond Variable", "EB Garamond", Georgia, serif;
+  --font-sans: "Inter Variable", "Inter", system-ui, sans-serif;
+
+  /* Tailles de titres (avec leur interligne et leur approche) */
+  --text-display: 3.5rem;
+  --text-display--line-height: 1.05;
+  --text-display--letter-spacing: -0.02em;
+  --text-headline: 2.5rem;
+  --text-headline--line-height: 1.2;
+  --text-headline--letter-spacing: -0.01em;
+
+  /* Lueur « lumière d'étoile » des éléments actifs */
+  --shadow-astre: 0 0 12px rgba(120, 97, 143, 0.35);
+  --shadow-flottant: 0 16px 32px -8px rgba(10, 8, 18, 0.75);
+}
+
+@layer base {
+  html {
+    background-color: var(--color-nuit);
+    color: var(--color-lune);
+    font-family: var(--font-sans);
+    color-scheme: dark;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    min-height: 100dvh;
+  }
+
+  ::selection {
+    background-color: var(--color-lavande);
+    color: var(--color-lune);
+  }
+
+  /* Contour de focus visible au clavier, discret mais net */
+  :focus-visible {
+    outline: 2px solid var(--color-argent);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+
+  /* Respecte le réglage « réduire les animations » du système */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
