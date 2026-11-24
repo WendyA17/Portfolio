@@ -18,7 +18,7 @@
   --color-lune: #f8f7fc;          /* Blanc Lunaire : titres, texte principal */
 
   /* Polices */
-  --font-serif: "EB Garamond Variable", "EB Garamond", Georgia, serif;
+  --font-serif: "Cormorant Garamond Variable", "Cormorant Garamond", Georgia, serif;
   --font-sans: "Inter Variable", "Inter", system-ui, sans-serif;
 
   /* Tailles de titres (avec leur interligne et leur approche) */
