@@ -21,6 +21,9 @@ const en: Dictionnaire = {
     contact: { lune: 'Last quarter', titre: 'Contact' },
     fin: { lune: 'Waning crescent', titre: 'End of the cycle' },
   },
+  navigation: {
+  libelle: 'Portfolio phases',
+},
 };
 
 export default en;

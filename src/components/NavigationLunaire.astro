@@ -1,0 +1,98 @@
+---
+// ─────────────────────────────────────────────────────────────
+// La navigation lunaire : une petite lune par section, sur le
+// côté droit. Chaque lune montre une phase du cycle, et celle
+// de la section visible s'agrandit et brille.
+// ─────────────────────────────────────────────────────────────
+import { traductions, type Langue } from '../i18n/utils';
+import { formeEclairee } from '../utils/Lune';
+
+interface Props {
+  langue: Langue;
+  /** Les identifiants des sections, dans l'ordre */
+  sections: readonly (keyof ReturnType<typeof traductions>['phases'])[];
+}
+
+const { langue, sections } = Astro.props;
+const t = traductions(langue);
+
+const lunes = sections.map((id, index) => ({
+  id,
+  numero: String(index + 1).padStart(2, '0'),
+  titre: t.phases[id].titre,
+  lune: t.phases[id].lune,
+  forme: formeEclairee(index / sections.length), // 0, 1/8, 2/8… : le cycle complet
+}));
+---
+
+<nav
+  aria-label={t.navigation.libelle}
+  class="fixed top-1/2 right-4 z-40 hidden -translate-y-1/2 flex-col items-center gap-1 md:flex lg:right-8"
+>
+  <!-- Trait décoratif au-dessus -->
+  <span class="mb-2 h-12 w-px bg-linear-to-b from-transparent to-bordure" aria-hidden="true"></span>
+
+  <ul class="flex flex-col items-center gap-1">
+    {
+      lunes.map((l) => (
+        <li>
+          <a
+            href={`#${l.id}`}
+            data-lune={l.id}
+            class="group relative flex size-9 items-center justify-center rounded-full"
+          >
+            <!-- Étiquette qui apparaît au survol ou au clavier -->
+            <span class="pointer-events-none absolute right-full mr-3 rounded-lg border border-bordure bg-surface-haute/95 px-3 py-1.5 text-xs whitespace-nowrap text-lune opacity-0 shadow-flottant transition-opacity duration-300 group-hover:opacity-100 group-focus-visible:opacity-100">
+              <span class="mr-1.5 font-serif text-sm text-lavande-claire italic">{l.numero}</span>
+              {l.titre}
+              <span class="sr-only"> — {l.lune}</span>
+            </span>
+
+            <!-- La petite lune -->
+            <svg
+              viewBox="-4 -4 108 108"
+              aria-hidden="true"
+              class="size-4 overflow-visible transition-[width,height,filter] duration-500 group-hover:size-5 group-aria-[current=true]:size-6 group-aria-[current=true]:drop-shadow-[0_0_8px_rgba(209,196,233,0.9)]"
+            >
+              <circle cx="50" cy="50" r="50" fill="#1b1729" stroke="#b8a9cb" stroke-width="5" opacity="0.9"></circle>
+              <path d={l.forme} fill="#f8f7fc"></path>
+            </svg>
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+
+  <!-- Trait décoratif en dessous -->
+  <span class="mt-2 h-12 w-px bg-linear-to-t from-transparent to-bordure" aria-hidden="true"></span>
+</nav>
+
+<!--
+  Ce script s'exécute dans le navigateur : il observe quelle section
+  occupe le milieu de l'écran et marque la lune correspondante.
+-->
+<script>
+  const liens = document.querySelectorAll<HTMLAnchorElement>('[data-lune]');
+
+  const marquer = (id: string) => {
+    liens.forEach((lien) => {
+      if (lien.dataset.lune === id) lien.setAttribute('aria-current', 'true');
+      else lien.removeAttribute('aria-current');
+    });
+  };
+
+  const observateur = new IntersectionObserver(
+    (entrees) => {
+      entrees.forEach((entree) => {
+        if (entree.isIntersecting) marquer(entree.target.id);
+      });
+    },
+    // Une section est « active » quand elle traverse la ligne du milieu de l'écran
+    { rootMargin: '-50% 0px -50% 0px' },
+  );
+
+  liens.forEach((lien) => {
+    const section = document.getElementById(lien.dataset.lune ?? '');
+    if (section) observateur.observe(section);
+  });
+</script>

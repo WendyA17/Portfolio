@@ -4,6 +4,7 @@
 import Layout from '../layouts/Layout.astro';
 import Header from '../components/Header.astro';
 import Phase from '../components/Phase.astro';
+import NavigationLunaire from '../components/NavigationLunaire.astro';
 import { traductions, type Langue } from '../i18n/utils';
 
 interface Props {
@@ -19,6 +20,7 @@ const ordre = ['accueil', 'histoire', 'competences', 'projets', 'etude', 'parcou
 
 <Layout langue={langue} snap>
   <Header langue={langue} />
+  <NavigationLunaire langue={langue} sections={ordre} />
 
   <main>
     {
