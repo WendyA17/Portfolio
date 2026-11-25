@@ -1,4 +1,5 @@
 @import "tailwindcss";
+
 /* ------------------------------------------------------------
    Design system « Portfolio Céleste »
    Chaque variable --color-xxx crée les classes bg-xxx, text-xxx,
@@ -32,6 +33,47 @@
   /* Lueur « lumière d'étoile » des éléments actifs */
   --shadow-astre: 0 0 12px rgba(120, 97, 143, 0.35);
   --shadow-flottant: 0 16px 32px -8px rgba(10, 8, 18, 0.75);
+
+  /* Animations du ciel → classes animate-scintille et animate-miroite */
+  --animate-scintille: scintille 4s ease-in-out infinite;
+  --animate-miroite: miroite 4.5s ease-in-out infinite;
+  --animate-lueur: lueur 6s ease-in-out infinite;
+
+  @keyframes scintille {
+    0%, 100% { opacity: var(--opacite, 1); scale: 1; }
+    50% { opacity: 0.1; scale: 0.7; }
+  }
+  @keyframes miroite {
+    0%, 100% { opacity: 0.9; scale: 1; }
+    50% { opacity: 0.45; scale: 0.82; }
+  }
+}
+
+/* Le halo de la lune qui « respire » */
+@keyframes lueur {
+  0%, 100% { opacity: calc(0.6 * var(--eclat, 1)); scale: 1; }
+  50% { opacity: calc(0.95 * var(--eclat, 1)); scale: 1.06; }
+}
+
+/* ------------------------------------------------------------
+   Utilitaires personnalisés : trop complexes pour des classes
+   Tailwind classiques, on les définit une fois ici et on les
+   utilise ensuite comme n'importe quelle classe.
+   ------------------------------------------------------------ */
+
+/* Trame de points discrète qui s'efface vers les bords */
+@utility trame-points {
+  background-image: radial-gradient(rgba(196, 181, 253, 0.07) 1px, transparent 1px);
+  background-size: 32px 32px;
+  mask-image: radial-gradient(ellipse at center, black 30%, transparent 80%);
+}
+
+/* Étoile en croix : un cœur brillant + deux fines lignes de lumière */
+@utility eclat {
+  background:
+radial-gradient(circle, var(--color-lune) 0 3px, rgba(209, 196, 233, 0.5) 4px, transparent 10px),    
+linear-gradient(to right, transparent, rgba(209, 196, 233, 0.6), transparent) center / 100% 1px no-repeat,
+linear-gradient(to bottom, transparent, rgba(209, 196, 233, 0.6), transparent) center / 1px 100% no-repeat;
 }
 
 @layer base {

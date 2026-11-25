@@ -1,0 +1,104 @@
+---
+// ─────────────────────────────────────────────────────────────
+// La lune « halo éthéré » : de la lumière pure qui irradie.
+//
+// phase = où en est la lune dans son cycle, de 0 à 1 :
+//   0    nouvelle lune (seul le contour est visible)
+//   0.25 premier quartier (moitié droite éclairée)
+//   0.5  pleine lune
+//   0.75 dernier quartier (moitié gauche éclairée)
+// ─────────────────────────────────────────────────────────────
+
+interface Props {
+  phase?: number;
+  /** Classes Tailwind de taille, ex. « size-44 md:size-72 » */
+  class?: string;
+  /** Douceur de la limite jour/nuit (0 = nette, 3 = très diffuse) */
+  douceur?: number;
+  /** Fait respirer le halo doucement */
+  anime?: boolean;
+  /** Intensité de la lueur autour de la lune (0 = aucune, 1 = normale, 1.5 = très forte) */
+  eclat?: number;
+  /** Intensité du contre-jour : la lumière qui déborde derrière la face sombre */
+  contreJour?: number;
+}
+
+const { phase = 0.5, class: classes = 'size-48', douceur = 2, anime = true, eclat = 1, contreJour = 1 } = Astro.props;
+
+// Identifiant unique, pour pouvoir afficher plusieurs lunes sur une même page
+const id = `lune-${Math.random().toString(36).slice(2, 9)}`;
+
+// ── Forme de la partie éclairée, dans un carré de 100 × 100 ──
+const p = ((phase % 1) + 1) % 1;
+const angle = 2 * Math.PI * p;
+const rx = Math.abs(Math.cos(angle)) * 50; // largeur de la limite jour/nuit
+const croissante = p < 0.5;                // la lumière vient de la droite
+const fin = Math.cos(angle) > 0;           // croissant fin ou lune gibbeuse ?
+const bord = croissante ? 1 : 0;
+const retour = croissante ? (fin ? 0 : 1) : fin ? 1 : 0;
+
+// Part éclairée de la lune (0 à la nouvelle lune, 1 à la pleine lune).
+// Plus la lune est sombre, plus le contre-jour est visible.
+const partEclairee = (1 - Math.cos(angle)) / 2;
+const intensiteContreJour = contreJour * (1 - partEclairee);
+const eclairee = p === 0 ? '' : `M50 0 A50 50 0 0 ${bord} 50 100 A${rx.toFixed(2)} 50 0 0 ${retour} 50 0 Z`;
+---
+
+<div class:list={['relative shrink-0', classes]} aria-hidden="true">
+  <svg viewBox="0 0 100 100" class="size-full overflow-visible">
+    <defs>
+      <!-- Dégradé de la lumière : blanc pur au centre, lavande sur les bords -->
+      <radialGradient id={`${id}-lumiere`} cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stop-color="#ffffff"></stop>
+        <stop offset="60%" stop-color="#f8f7fc"></stop>
+        <stop offset="100%" stop-color="#d1c4e9"></stop>
+      </radialGradient>
+      <!-- Flous : la limite jour/nuit, le halo proche et le grand halo -->
+      <filter id={`${id}-limite`} x="-20%" y="-20%" width="140%" height="140%">
+        <feGaussianBlur stdDeviation={douceur}></feGaussianBlur>
+      </filter>
+      <filter id={`${id}-halo`} x="-60%" y="-60%" width="220%" height="220%">
+        <feGaussianBlur stdDeviation="4"></feGaussianBlur>
+      </filter>
+      <filter id={`${id}-rayonnement`} x="-100%" y="-100%" width="300%" height="300%">
+        <feGaussianBlur stdDeviation="14"></feGaussianBlur>
+      </filter>
+      <mask id={`${id}-masque`}>
+        <path d={eclairee} fill="white" filter={`url(#${id}-limite)`}></path>
+      </mask>
+      <clipPath id={`${id}-disque`}>
+        <circle cx="50" cy="50" r="50"></circle>
+      </clipPath>
+    </defs>
+
+    <!-- 0. Le contre-jour : une couronne de lumière derrière le disque,
+         très présente à la nouvelle lune, absente à la pleine lune -->
+    <g style={`--eclat:${intensiteContreJour.toFixed(2)}`} class:list={[anime && 'animate-lueur']} opacity={Math.min(1, intensiteContreJour)}>
+      <circle cx="50" cy="50" r="52" fill="#b8a9cb" filter={`url(#${id}-rayonnement)`}></circle>
+      <circle cx="50" cy="50" r="51" fill="#d1c4e9" filter={`url(#${id}-halo)`}></circle>
+    </g>
+
+    <!-- 1. Le grand rayonnement lavande, qui respire -->
+    <path
+      d={eclairee}
+      fill="#d1c4e9"
+      filter={`url(#${id}-rayonnement)`}
+      class:list={[anime && 'animate-lueur']}
+      style={`--eclat:${eclat}`}
+      opacity={Math.min(1, 0.9 * eclat)}
+    ></path>
+
+    <!-- 2. Le disque dans l'ombre, avec un contour à peine visible -->
+    <circle cx="50" cy="50" r="49.7" fill="#1b1729" stroke="#49365f" stroke-width="0.6"></circle>
+    <!-- Liseré lumineux sur le bord, révélé par le contre-jour -->
+    <circle cx="50" cy="50" r="49.6" fill="none" stroke="#f8f7fc" stroke-width="0.7" opacity={(0.55 * intensiteContreJour).toFixed(2)}></circle>
+
+    <!-- 3. Le halo proche, blanc -->
+    <path d={eclairee} fill="#f8f7fc" filter={`url(#${id}-halo)`} opacity={Math.min(1, 0.75 * eclat)}></path>
+
+    <!-- 4. La partie éclairée, avec une limite jour/nuit adoucie -->
+    <g clip-path={`url(#${id}-disque)`}>
+      <circle cx="50" cy="50" r="50" fill={`url(#${id}-lumiere)`} mask={`url(#${id}-masque)`}></circle>
+    </g>
+  </svg>
+</div>

@@ -1,0 +1,33 @@
+---
+import { langues, urlDansLangue, type Langue } from '../i18n/utils';
+
+interface Props {
+  langue: Langue;
+  libelle: string; // texte lu par les lecteurs d'écran
+}
+
+const { langue, libelle } = Astro.props;
+---
+
+<nav aria-label={libelle}>
+  <ul class="flex gap-1 rounded-full border border-bordure p-1 text-xs font-semibold">
+    {
+      langues.map((l) => (
+        <li>
+          <a
+            href={urlDansLangue(Astro.url, l)}
+            hreflang={l}
+            lang={l}
+            aria-current={l === langue ? 'page' : undefined}
+            class:list={[
+              'block rounded-full px-3 py-1.5 uppercase transition-colors duration-300',
+              l === langue ? 'bg-lavande text-lune' : 'text-lavande-claire hover:text-lune',
+            ]}
+          >
+            {l}
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</nav>

@@ -4,41 +4,41 @@ import '@fontsource-variable/cormorant-garamond';
 import '@fontsource-variable/cormorant-garamond/wght-italic.css';
 import '@fontsource-variable/inter';
 import '../styles/global.css';
+import CielEtoile from '../components/CielEtoile.astro';
+import { langues, traductions, urlDansLangue, type Langue } from '../i18n/utils';
 
 interface Props {
-  title?: string;
+  langue: Langue;
+  /** Titre de l'onglet (par défaut : celui du fichier de traduction) */
+  titre?: string;
   description?: string;
-  lang?: 'fr' | 'en';
   /** Active le défilement section par section (scroll snap) */
   snap?: boolean;
 }
 
-const {
-  title = 'Wendy Asmatico — Développeuse web créative',
-  description = 'Portfolio de Wendy Asmatico, développeuse web créative et architecte frontend.',
-  lang = 'fr',
-  snap = false,
-} = Astro.props;
+const { langue, snap = false } = Astro.props;
+const t = traductions(langue);
+const titre = Astro.props.titre ?? t.meta.titre;
+const description = Astro.props.description ?? t.meta.description;
+const base = Astro.site ?? Astro.url;
 ---
 
 <!doctype html>
-<html
-  lang={lang}
-  class:list={[
-    // Sur mobile : calage « souple » (le texte long reste lisible)
-    // Dès la tablette : calage strict, section par section
-    snap && 'snap-y snap-proximity md:snap-mandatory',
-  ]}
->
+<html lang={langue} class:list={[snap && 'snap-y snap-proximity md:snap-mandatory']}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
     <meta name="theme-color" content="#151321" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <title>{title}</title>
+
+    <!-- Indique à Google que cette page existe dans chaque langue -->
+    {langues.map((l) => <link rel="alternate" hreflang={l} href={new URL(urlDansLangue(Astro.url, l), base)} />)}
+
+    <title>{titre}</title>
   </head>
   <body>
+    <CielEtoile />
     <slot />
   </body>
 </html>

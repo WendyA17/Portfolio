@@ -1,25 +1,37 @@
 ---
 import Logo from '../assets/logo/logo-wa-petit.svg';
+import SelecteurLangue from './SelecteurLangue.astro';
+import { traductions, urlDansLangue, type Langue } from '../i18n/utils';
+
+interface Props {
+  langue: Langue;
+}
+
+const { langue } = Astro.props;
+const t = traductions(langue);
+const accueil = urlDansLangue(new URL('/', Astro.url), langue);
 ---
 
 <header
   class="fixed inset-x-0 top-0 z-50 h-20 border-b border-bordure bg-surface/90 backdrop-blur-xl"
 >
-  <div class="mx-auto flex h-full max-w-7xl items-center justify-between gap-6 px-5 md:px-12">
-    <!-- Logo + nom : retour à l'accueil -->
-    <a href="/" class="flex items-center gap-3 rounded-lg">
+  <div class="mx-auto flex h-full max-w-7xl items-center justify-between gap-3 px-5 md:px-12">
+    <!-- Logo + nom : retour à l'accueil (le nom se masque sur les petits téléphones) -->
+    <a href={accueil} aria-label={t.header.accueil} class="flex min-w-0 items-center gap-3 rounded-lg">
       <Logo class="size-10 shrink-0" aria-hidden="true" />
-      <span class="font-serif text-2xl leading-none whitespace-nowrap text-lune">
+      <span class="hidden font-serif text-xl leading-none font-medium whitespace-nowrap text-lune min-[420px]:inline sm:text-[1.65rem]">
         Wendy Asmatico
       </span>
     </a>
 
-    <!-- Le sélecteur FR / EN arrivera avec la traduction -->
-    <a
-      href="#contact"
-      class="rounded-lg bg-lavande px-5 py-2.5 text-sm font-semibold text-lune transition-[background-color,box-shadow] duration-300 hover:bg-lavande-vive hover:shadow-astre"
-    >
-      Collaborer
-    </a>
+    <div class="flex shrink-0 items-center gap-3 md:gap-4">
+      <SelecteurLangue langue={langue} libelle={t.header.choixLangue} />
+      <a
+        href="#contact"
+        class="rounded-lg bg-lavande px-4 py-2.5 text-sm font-semibold whitespace-nowrap text-lune transition-[background-color,box-shadow] duration-300 hover:bg-lavande-vive hover:shadow-astre sm:px-5"
+      >
+        {t.header.collaborer}
+      </a>
+    </div>
   </div>
 </header>

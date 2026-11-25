@@ -1,0 +1,96 @@
+---
+// ─────────────────────────────────────────────────────────────
+// Le ciel étoilé, fixe derrière tout le site.
+// Les étoiles sont placées « au hasard », mais avec un hasard
+// reproductible (une graine) : le ciel est identique à chaque
+// visite et à chaque build.
+// Les styles complexes (trame, éclats, animations) sont définis
+// une seule fois dans global.css.
+// ─────────────────────────────────────────────────────────────
+
+interface Props {
+  /** Nombre de petites étoiles */
+  nombre?: number;
+  /** Change ce nombre pour obtenir une autre disposition */
+  graine?: number;
+}
+
+const { nombre = 110, graine = 7 } = Astro.props;
+
+// Petit générateur de nombres pseudo-aléatoires (mulberry32)
+function generateur(seed: number) {
+  return () => {
+    seed |= 0;
+    seed = (seed + 0x6d2b79f5) | 0;
+    let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+const hasard = generateur(graine);
+const entre = (min: number, max: number) => min + hasard() * (max - min);
+
+const etoiles = Array.from({ length: nombre }, () => ({
+  x: entre(0, 100).toFixed(2),
+  y: entre(0, 100).toFixed(2),
+  taille: entre(1, 2.6).toFixed(1),
+  opacite: entre(0.25, 0.85).toFixed(2),
+  scintille: hasard() < 0.25, // 1 étoile sur 4 scintille
+  duree: entre(3, 6.5).toFixed(1),
+  delai: entre(0, 5).toFixed(1),
+}));
+
+// Étoiles brillantes en croix, placées à la main loin du centre
+const eclats = [
+  // Les éclats moyens
+  { x: 90, y: 68, taille: 52, delai: 2.9 },
+  { x: 24, y: 82, taille: 40, delai: 1.1 },
+  // Les 3 grandes étoiles
+  { x: 6, y: 56, taille: 84, delai: 0.9 },
+  { x: 95, y: 34, taille: 76, delai: 2.3 },
+  { x: 80, y: 84, taille: 80, delai: 3.6 },
+  { x: 14, y: 22, taille: 84, delai: 0.9 },
+  { x: 86, y: 22, taille: 76, delai: 2.3 },
+
+  // Les petits éclats
+  { x: 37, y: 9, taille: 18, delai: 0.2 },
+  { x: 71, y: 5, taille: 14, delai: 1.4 },
+  { x: 3, y: 90, taille: 20, delai: 2.6 },
+  { x: 97, y: 88, taille: 16, delai: 3.1 },
+  { x: 33, y: 95, taille: 18, delai: 1.9 },
+  { x: 78, y: 50, taille: 14, delai: 0.7 },
+];
+---
+
+<div
+  aria-hidden="true"
+  class="pointer-events-none fixed inset-0 -z-10 overflow-hidden bg-radial-[at_50%_15%] from-surface via-nuit via-60% to-[#0e0c17]"
+>
+  <!-- Nébuleuses : deux halos colorés très diffus -->
+  <div class="absolute -top-[10vmax] -left-[15vmax] size-[55vmax] rounded-full bg-radial from-lavande/35 to-transparent to-70% blur-[80px]"></div>
+  <div class="absolute -right-[20vmax] -bottom-[20vmax] size-[60vmax] rounded-full bg-radial from-[#222c50]/55 to-transparent to-70% blur-[80px]"></div>
+
+  <!-- Trame de points (utilitaire défini dans global.css) -->
+  <div class="trame-points absolute inset-0"></div>
+
+  <!-- Petites étoiles : seules la position et le rythme restent en style,
+       car ils sont différents pour chaque étoile -->
+  {
+    etoiles.map((e) => (
+      <span
+        class:list={['absolute rounded-full bg-lune opacity-(--opacite)', e.scintille && 'animate-scintille']}
+        style={`left:${e.x}%;top:${e.y}%;width:${e.taille}px;height:${e.taille}px;--opacite:${e.opacite};animation-duration:${e.duree}s;animation-delay:${e.delai}s`}
+      />
+    ))
+  }
+
+  <!-- Éclats en croix -->
+  {
+    eclats.map((e) => (
+      <span
+        class="eclat absolute -translate-1/2 animate-miroite"
+        style={`left:${e.x}%;top:${e.y}%;width:${e.taille}px;height:${e.taille}px;animation-delay:${e.delai}s`}
+      />
+    ))
+  }
+</div>
