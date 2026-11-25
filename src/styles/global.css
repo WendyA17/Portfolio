@@ -21,6 +21,8 @@
   /* Polices */
   --font-serif: "Cormorant Garamond Variable", "Cormorant Garamond", Georgia, serif;
   --font-sans: "Inter Variable", "Inter", system-ui, sans-serif;
+  /* Réservée aux annotations façon carnet d'observation */
+--font-manuscrite: "Caveat Variable", "Caveat", cursive;
 
   /* Tailles de titres (avec leur interligne et leur approche) */
   --text-display: 3.5rem;
@@ -32,7 +34,12 @@
 
   /* Lueur « lumière d'étoile » des éléments actifs */
   --shadow-astre: 0 0 12px rgba(120, 97, 143, 0.35);
-  --shadow-flottant: 0 16px 32px -8px rgba(10, 8, 18, 0.75);
+  --shadow-flottant: 0 16px 32px -8px rgba(10, 8, 18, 0.75)
+  
+  /* Couronne lumineuse de l'éclipse (photo de la phase 02) */
+--shadow-eclipse: 0 0 0 2px rgba(248, 247, 252, 0.9), 0 0 24px 6px rgba(248, 247, 252, 0.45),
+  0 0 80px 26px rgba(209, 196, 233, 0.35), 0 0 160px 60px rgba(120, 97, 143, 0.3);
+--inset-shadow-eclipse: inset 0 0 50px rgba(21, 19, 33, 0.55);
 
   /* Animations du ciel → classes animate-scintille et animate-miroite */
   --animate-scintille: scintille 4s ease-in-out infinite;

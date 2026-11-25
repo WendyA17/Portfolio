@@ -1,10 +1,13 @@
 ---
 // Phase 02 · Premier croissant — « Mon histoire »
+// À gauche : qui tu es (ton avatar en éclipse, tes passions en orbite)
+// À droite : ce que tu fais (le récit et tes domaines)
 import Phase from '../Phase.astro';
 import Lune from '../Lune.astro';
-import Polaroid from '../Polaroid.astro';
-import { traductions, type Langue } from '../../i18n/utils';
+import OrbitePassions from '../OrbitePassions.astro';
 import maPhoto from '../../assets/wendy.png';
+import { traductions, type Langue } from '../../i18n/utils';
+
 interface Props {
   langue: Langue;
   numero: number;
@@ -14,62 +17,51 @@ interface Props {
 const { langue, numero, total } = Astro.props;
 const t = traductions(langue);
 const h = t.histoire;
+const numeroAffiche = String(numero).padStart(2, '0');
+
+// Une icône par domaine
+const icones = [
+  'm8 7-5 5 5 5M16 7l5 5-5 5',                      // code
+  'M12 3l7 7-7 11-7-11zM12 9.4a1.6 1.6 0 1 0 0 3.2a1.6 1.6 0 1 0 0-3.2', // plume
+];
 ---
 
 <Phase id="histoire" numero={numero} total={total} lune={t.phases.histoire.lune} titre={t.phases.histoire.titre}>
-  <div class="grid w-full max-w-6xl items-center gap-12 text-left md:grid-cols-[minmax(0,17rem)_1fr] md:gap-16 lg:gap-24">
+  <div class="grid w-full max-w-6xl items-center gap-10 text-left md:grid-cols-2 md:gap-12 lg:gap-20">
 
-    <!-- Colonne de gauche : la photo et quelques infos -->
-    <div class="mx-auto flex w-full max-w-60 flex-col items-center gap-8 md:max-w-none court:gap-5">
-      <Polaroid
-        photo={maPhoto}
-        format="carre"
-        alt={h.photoAlt}
-        legende="Wendy Asmatico"
-        sousLegende={h.photoLegende}
-        class="w-44 sm:w-52 md:w-full court:md:w-52"
-      />
-
-      <dl class="grid w-full gap-3 text-sm court:gap-2">
-        {
-          h.fiche.map((info) => (
-            <div class="flex items-baseline justify-between gap-4 border-b border-bordure/70 pb-2">
-              <dt class="text-xs tracking-wider text-lavande-claire uppercase">{info.label}</dt>
-              <dd class="text-right text-argent">{info.valeur}</dd>
-            </div>
-          ))
-        }
-      </dl>
-    </div>
+    <!-- Colonne de gauche : l'éclipse et les passions -->
+    <OrbitePassions photo={maPhoto} alt={h.avatarAlt} passions={h.passions} legende={h.legende} />
 
     <!-- Colonne de droite : le récit -->
     <div class="flex flex-col gap-6 court:gap-4">
-      <div class="flex items-center gap-4">
-        <Lune phase={0.125} class="size-12 md:size-14" eclat={0.8} />
-        <p class="text-xs tracking-[0.2em] text-lavande-claire uppercase">
-          {t.phases.histoire.titre}
+      <!-- Le journal d'observation, avec la lune en premier croissant -->
+      <div class="flex items-center gap-5">
+        <Lune phase={0.125} class="size-14 md:size-[4.75rem] court:md:size-14" eclat={0.9} contreJour={0.6} />
+        <p class="flex flex-col gap-1">
+          <span class="text-xs font-medium tracking-[0.24em] text-argent uppercase">{h.journal}</span>
+          <span class="font-serif text-2xl text-lune italic">Phase {numeroAffiche} — {t.phases.histoire.lune}</span>
         </p>
       </div>
 
-      <h2 class="font-serif text-4xl leading-tight font-medium tracking-tight md:text-5xl lg:text-6xl court:lg:text-5xl">
+      <h2 class="font-serif text-4xl leading-[1.05] font-medium tracking-tight md:text-5xl lg:text-6xl court:lg:text-5xl">
         {h.titre}
       </h2>
 
-      <div class="flex max-w-2xl flex-col gap-4 text-base leading-relaxed text-argent md:text-lg court:md:text-base">
-        {h.paragraphes.map((texte) => <p>{texte}</p>)}
-      </div>
+      <p class="max-w-xl text-base leading-relaxed text-argent md:text-lg">{h.paragraphe}</p>
 
-      <!-- Ce qui me guide : trois valeurs -->
-      <ul class="grid gap-3 sm:grid-cols-3">
+      <!-- Mes domaines, sur une ligne -->
+      <ul aria-label={h.domainesLabel} class="flex flex-wrap items-center gap-x-5 gap-y-2 border-y border-bordure/80 py-3.5">
         {
-          h.valeurs.map((valeur) => (
-            <li class="rounded-lg border border-bordure bg-surface/60 p-4 backdrop-blur-sm court:p-3">
-              <p class="flex items-center gap-2 font-serif text-xl font-medium text-lune">
-                <span aria-hidden="true" class="eclat size-4 shrink-0" />
-                {valeur.titre}
-              </p>
-              <p class="mt-1.5 text-sm leading-snug text-lavande-claire">{valeur.texte}</p>
-            </li>
+          h.domaines.map((domaine, i) => (
+            <>
+              {i > 0 && <li aria-hidden="true" class="hidden text-lavande sm:block">✦</li>}
+              <li class="flex items-center gap-2.5 font-serif text-2xl font-medium">
+                <svg class="size-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="#d1c4e9" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d={icones[i % icones.length]} />
+                </svg>
+                {domaine}
+              </li>
+            </>
           ))
         }
       </ul>

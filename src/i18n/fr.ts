@@ -16,7 +16,7 @@ const fr = {
   // Une entrée par section de l'accueil : le nom de la phase lunaire et le titre
   phases: {
     accueil: { lune: 'Nouvelle lune', titre: 'Accueil' },
-    histoire: { lune: 'Premier croissant', titre: 'Mon histoire' },
+    histoire: { lune: 'Premier croissant', titre: 'Présentation' },
     competences: { lune: 'Premier quartier', titre: 'Compétences' },
     projets: { lune: 'Gibbeuse croissante', titre: 'Projets' },
     etude: { lune: 'Pleine lune', titre: 'Étude de cas' },
@@ -41,23 +41,14 @@ ouverture: {
   defiler: 'Faites défiler',
 },
 histoire: {
+  journal: 'Journal d’observation',
   titre: 'L’éveil d’une passion entre création et code.',
-  paragraphes: [
-    'Je suis Wendy Asmatico, développeuse web créative. Entre le soin du design et la rigueur du code, je conçois des interfaces qui allient beauté et efficacité.',
-    'J’aime les projets qui ont du sens : comprendre ce qui vous anime, puis le traduire en une expérience claire, rapide et agréable, pensée dans ses moindres détails.',
-  ],
-  valeurs: [
-    { titre: 'Créativité', texte: 'Chaque projet est l’occasion d’inventer une expérience singulière.' },
-    { titre: 'Soin', texte: 'Typographie, accessibilité, performance : tout se joue dans les détails.' },
-    { titre: 'Écoute', texte: 'Construire ensemble des projets qui nous ressemblent.' },
-  ],
-  fiche: [
-    { label: 'Basée à', valeur: 'Marseille' },
-    { label: 'Langues', valeur: 'Français · Anglais' },
-    { label: 'Curiosités', valeur: 'Code · Design' },
-  ],
-  photoAlt: 'Portrait de Wendy Asmatico',
-  photoLegende: 'Développeuse web créative',
+  paragraphe: 'Je suis Wendy, développeuse web créative. Entre design soigné et code rigoureux, je façonne des projets concrets, créatifs et qui nous ressemblent. Et quand je ne code pas, je voyage dans d’autres mondes.',
+  domainesLabel: 'Mes domaines',
+  domaines: ['Développement web', 'Design d’interface'],
+  passions: { jeu: 'jeu vidéo', lecture: 'lecture', dessin: 'dessin' },
+  legende: 'ce qui gravite autour de moi…',
+  avatarAlt: 'Avatar illustré de Wendy Asmatico',
   lien: 'Découvrir mes compétences',
 },
 };

@@ -1,0 +1,90 @@
+---
+// ─────────────────────────────────────────────────────────────
+// Ton avatar en éclipse, et tes passions en orbite autour.
+// Toute la scène est dessinée dans un repère de 680 × 440 :
+// elle s'agrandit ou rétrécit d'un bloc selon la largeur disponible.
+// ─────────────────────────────────────────────────────────────
+import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+
+interface Props {
+  photo: ImageMetadata;
+  alt: string;
+  passions: { jeu: string; lecture: string; dessin: string };
+  legende: string; // « ce qui gravite autour de moi… »
+}
+
+const { photo, alt, passions, legende } = Astro.props;
+
+// L'orbite : une ellipse inclinée autour du centre de l'éclipse
+const orbite = { cx: 340, cy: 180, rx: 270, ry: 88, inclinaison: -14 };
+
+// Position d'un point de l'orbite, selon son angle (en degrés)
+function surOrbite(angle: number) {
+  const a = (angle * Math.PI) / 180;
+  const r = (orbite.inclinaison * Math.PI) / 180;
+  const x = orbite.rx * Math.cos(a);
+  const y = orbite.ry * Math.sin(a);
+  return {
+    x: orbite.cx + x * Math.cos(r) - y * Math.sin(r),
+    y: orbite.cy + x * Math.sin(r) + y * Math.cos(r),
+  };
+}
+
+// Les trois planètes, chacune avec son icône
+const planetes = [
+  { cle: 'jeu', angle: 195, icone: 'M5 6h14a5 5 0 0 1 4.6 7l-1.4 5a3 3 0 0 1-5 1.2L15 17H9l-2.2 2.2a3 3 0 0 1-5-1.2L.4 13A5 5 0 0 1 5 6zM6 10v4M4 12h4' },
+  { cle: 'lecture', angle: 318, icone: 'M12 6C9 4 5 4 1 5v14c4-1 8-1 11 1 3-2 7-2 11-1V5c-4-1-8-1-11 1zM12 6v14' },
+  { cle: 'dessin', angle: 58, icone: 'M17 3l4 4L9 19l-5 1 1-5zM14 6l4 4' },
+] as const;
+const positions = planetes.map((p) => ({ ...p, ...surOrbite(p.angle) }));
+
+// Où écrire le nom de chaque passion (en % de la scène)
+const etiquettes = {
+  jeu: 'left-[4%] top-[57%] -rotate-6',
+  lecture: 'left-[81%] top-[8%] rotate-3',
+  dessin: 'left-[78%] top-[55%] rotate-3',
+} as const;
+
+---
+
+<div class="@container relative mx-auto aspect-[680/440] w-full max-w-2xl">
+  <!-- Pour les lecteurs d'écran : la liste des passions en texte -->
+  <p class="sr-only">{legende} {passions.jeu}, {passions.lecture}, {passions.dessin}.</p>
+
+  <!-- Moitié arrière de l'orbite (elle passe derrière l'éclipse) -->
+  <svg viewBox="0 0 680 440" class="absolute inset-0 size-full overflow-visible" aria-hidden="true">
+    <g transform={`translate(${orbite.cx} ${orbite.cy}) rotate(${orbite.inclinaison})`}>
+      <path d={`M-${orbite.rx} 0 A${orbite.rx} ${orbite.ry} 0 0 1 ${orbite.rx} 0`} fill="none" stroke="#b8a9cb" stroke-width="1" stroke-dasharray="3 5" opacity="0.55"></path>
+    </g>
+  </svg>
+
+  <!-- L'éclipse : ton avatar et sa couronne lavande -->
+  <div class="absolute left-[30.9%] top-[11.4%] w-[38.2%] overflow-hidden rounded-full shadow-eclipse">
+    <Image src={photo} alt={alt} widths={[260, 520]} sizes="(min-width: 768px) 260px, 40vw" class="aspect-square w-full object-cover" />
+    <span class="absolute inset-0 rounded-full inset-shadow-eclipse" aria-hidden="true"></span>
+  </div>
+
+  <!-- Moitié avant de l'orbite + les planètes -->
+  <svg viewBox="0 0 680 440" class="absolute inset-0 size-full overflow-visible" aria-hidden="true">
+    <g transform={`translate(${orbite.cx} ${orbite.cy}) rotate(${orbite.inclinaison})`}>
+      <path d={`M${orbite.rx} 0 A${orbite.rx} ${orbite.ry} 0 0 1 -${orbite.rx} 0`} fill="none" stroke="#d1c4e9" stroke-width="1.2" opacity="0.8"></path>
+    </g>
+    {
+      positions.map((p) => (
+        <g>
+          <circle cx={p.x} cy={p.y} r="22" fill="#252039" stroke="#b8a9cb" stroke-width="1.2" />
+          <path d={p.icone} transform={`translate(${p.x - 12} ${p.y - 12})`} fill="none" stroke="#d1c4e9" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+        </g>
+      ))
+    }
+  </svg>
+
+  <!-- Annotations manuscrites (la taille suit la largeur de la scène : cqw) -->
+  <div aria-hidden="true" class="font-manuscrite text-[max(0.9rem,3.4cqw)] text-lavande-claire">
+    <span class:list={['absolute', etiquettes.jeu]}>{passions.jeu}</span>
+    <span class:list={['absolute', etiquettes.lecture]}>{passions.lecture}</span>
+    <span class:list={['absolute', etiquettes.dessin]}>{passions.dessin}</span>
+    <span class="absolute top-[88%] left-[35%] -rotate-2 text-[max(0.85rem,3.1cqw)]">{legende}</span>
+  </div>
+</div>
