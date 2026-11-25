@@ -1,8 +1,0 @@
----
-import Lune from '../components/Lune.astro';
-import '../styles/global.css';
-const phases = [0, 0.06, 0.125, 0.25, 0.375, 0.5, 0.625, 0.75, 0.875, 0.94];
----
-<html><body style="background:#151321;display:flex;flex-wrap:wrap;gap:24px;padding:24px">
-{phases.map((p) => <div style="color:#ccc;font:12px sans-serif;text-align:center"><Lune phase={p} class="size-40" /><p>{p}</p></div>)}
-</body></html>
