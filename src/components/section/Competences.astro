@@ -1,0 +1,74 @@
+---
+// Phase 03 · Premier quartier — « Compétences »
+import Phase from '../Phase.astro';
+import Lune from '../Lune.astro';
+import Constellation from '../Constellation.astro';
+import { constellations } from '../../data/competence';
+import { traductions, type Langue } from '../../i18n/utils';
+
+interface Props {
+  langue: Langue;
+  numero: number;
+  total: number;
+}
+
+const { langue, numero, total } = Astro.props;
+const t = traductions(langue);
+const c = t.competences;
+const numeroAffiche = String(numero).padStart(2, '0');
+---
+
+<Phase id="competences" numero={numero} total={total} lune={t.phases.competences.lune} titre={t.phases.competences.titre}>
+  <div class="flex w-full max-w-6xl flex-col gap-8 text-left court:gap-4">
+
+    <!-- En-tête : journal d'observation, titre et introduction -->
+    <div class="flex flex-col justify-between gap-6 md:flex-row md:items-end">
+      <div class="flex flex-col gap-5 court:gap-3">
+        <div class="flex items-center gap-5">
+          <Lune phase={0.25} class="size-14 court:size-12" eclat={0.9} contreJour={0.4} />
+          <p class="flex flex-col gap-1">
+            <span class="text-xs font-medium tracking-[0.24em] text-argent uppercase">{c.journal}</span>
+            <span class="font-serif text-2xl text-lune italic">Phase {numeroAffiche} — {t.phases.competences.lune}</span>
+          </p>
+        </div>
+        <h2 class="font-serif text-4xl leading-none font-medium tracking-tight md:text-6xl court:md:text-5xl">{c.titre}</h2>
+      </div>
+      <p class="max-w-sm text-base leading-relaxed text-argent">{c.intro}</p>
+    </div>
+
+    <!-- Les trois constellations -->
+    <div data-constellations class="group grid gap-10 sm:grid-cols-2 md:grid-cols-3 md:gap-6">
+      {constellations.map((constellation, i) => <Constellation constellation={constellation} textes={c} decalage={i * 0.4} />)}
+    </div>
+  </div>
+
+  <!-- En bas à droite : la légende -->
+  <p slot="bas" class="flex items-center gap-2 text-or normal-case">
+    <span class="size-2 rounded-full bg-or-clair shadow-[0_0_8px_rgba(244,223,160,0.8)]"></span>
+    {c.legende}
+  </p>
+</Phase>
+
+<!-- Sans JavaScript, les constellations s'affichent directement -->
+<noscript>
+  <style>
+    [data-constellations] * { opacity: 1 !important; scale: 1 !important; stroke-dashoffset: 0 !important; }
+  </style>
+</noscript>
+
+<!-- Les constellations s'allument quand la section entre à l'écran -->
+<script>
+  const zones = document.querySelectorAll<HTMLElement>('[data-constellations]');
+  const observateur = new IntersectionObserver(
+    (entrees) => {
+      entrees.forEach((entree) => {
+        if (entree.isIntersecting) {
+          entree.target.setAttribute('data-visible', '');
+          observateur.unobserve(entree.target); // une seule fois
+        }
+      });
+    },
+    { threshold: 0.3 },
+  );
+  zones.forEach((zone) => observateur.observe(zone));
+</script>

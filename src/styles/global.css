@@ -16,7 +16,9 @@
   --color-lavande-vive: #8a71a3;  /* survol des boutons principaux */
   --color-lavande-claire: #b8a9cb;/* textes secondaires */
   --color-argent: #d1c4e9;        /* lueur argentée des survols */
-  --color-lune: #f8f7fc;          /* Blanc Lunaire : titres, texte principal */
+  --color-lune: #f8f7fc; 
+  --color-or: #f4dfa0;            /* Or pâle : les coups de cœur */
+--color-or-clair: #fff3cf;         /* Blanc Lunaire : titres, texte principal */
 
   /* Polices */
   --font-serif: "Cormorant Garamond Variable", "Cormorant Garamond", Georgia, serif;
@@ -73,6 +75,14 @@
   background-image: radial-gradient(rgba(196, 181, 253, 0.07) 1px, transparent 1px);
   background-size: 32px 32px;
   mask-image: radial-gradient(ellipse at center, black 30%, transparent 80%);
+}
+
+/* Variante dorée de l'étoile en croix (les coups de cœur) */
+@utility eclat-or {
+  background:
+    radial-gradient(circle, var(--color-or-clair) 0 2px, rgba(244, 223, 160, 0.5) 3px, transparent 7px),
+    linear-gradient(to right, transparent, rgba(244, 223, 160, 0.75), transparent) center / 100% 1px no-repeat,
+    linear-gradient(to bottom, transparent, rgba(244, 223, 160, 0.75), transparent) center / 1px 100% no-repeat;
 }
 
 /* Étoile en croix : un cœur brillant + deux fines lignes de lumière */

@@ -1,0 +1,135 @@
+---
+// ─────────────────────────────────────────────────────────────
+// Une constellation : des étoiles reliées par des traits fins.
+// Chaque étoile est un bouton : au survol, au clavier ou au toucher,
+// une bulle explique la compétence.
+// La scène mesure 396 × 340 et s'adapte à la largeur disponible.
+// ─────────────────────────────────────────────────────────────
+import type { Constellation } from '../data/competence';
+import type { Dictionnaire } from '../i18n/utils';
+
+interface Props {
+  constellation: Constellation;
+  textes: Dictionnaire['competences'];
+  /** Décalage de l'animation d'apparition (pour que les familles s'allument l'une après l'autre) */
+  decalage?: number;
+}
+
+const { constellation, textes, decalage = 0 } = Astro.props;
+const { etoiles, liens } = constellation;
+
+const LARGEUR = 396;
+const HAUTEUR = 340;
+const enPourcent = (x: number, y: number) => `left:${(x / LARGEUR) * 100}%;top:${(y / HAUTEUR) * 100}%`;
+const id = `constellation-${constellation.cle}`;
+---
+
+<figure class="flex flex-col items-center gap-3">
+  <div class="@container relative aspect-[396/340] w-full">
+    <!-- Les traits : ils se dessinent quand la section apparaît -->
+    <svg viewBox={`0 0 ${LARGEUR} ${HAUTEUR}`} class="absolute inset-0 size-full overflow-visible" aria-hidden="true">
+      {
+        liens.map(([a, b], i) => (
+          <line
+            x1={etoiles[a].x}
+            y1={etoiles[a].y}
+            x2={etoiles[b].x}
+            y2={etoiles[b].y}
+            pathLength="1"
+            stroke="#b8a9cb"
+            stroke-width="1"
+            stroke-dasharray="1"
+            class="opacity-45 transition-[stroke-dashoffset] duration-[1.4s] ease-out [stroke-dashoffset:1] group-data-visible:[stroke-dashoffset:0]"
+            style={`transition-delay:${decalage + 0.5 + i * 0.12}s`}
+          />
+        ))
+      }
+    </svg>
+
+    <!-- Les étoiles -->
+    <ul class="absolute inset-0">
+      {
+        etoiles.map((etoile, i) => {
+          const texte = textes.etoiles[etoile.cle];
+          const bulleId = `${id}-${etoile.cle}`;
+          return (
+            <li
+              class="absolute size-0 scale-50 opacity-0 transition-[opacity,scale] duration-700 ease-out group-data-visible:scale-100 group-data-visible:opacity-100 hover:z-20 focus-within:z-20"
+              style={`${enPourcent(etoile.x, etoile.y)};transition-delay:${decalage + i * 0.08}s`}
+            >
+              <button
+                type="button"
+                aria-describedby={bulleId}
+                class="group/etoile absolute -top-5 -left-5 flex size-10 cursor-help items-center justify-center rounded-full"
+              >
+                <!-- Halo -->
+                <span
+                  aria-hidden="true"
+                  class:list={[
+                    'absolute rounded-full transition-transform duration-500 group-hover/etoile:scale-150 group-focus/etoile:scale-150',
+                    etoile.favori
+                      ? 'size-14 bg-radial from-or/60 to-transparent to-70%'
+                      : 'size-10 bg-radial from-argent/40 to-transparent to-70%',
+                  ]}
+                />
+                <!-- Petite croix scintillante -->
+                <span
+                  aria-hidden="true"
+                  class:list={['absolute animate-miroite', etoile.favori ? 'eclat-or size-9' : 'eclat size-6']}
+                  style={`animation-delay:${(i * 0.7) % 4}s`}
+                />
+                <!-- Le cœur de l'étoile -->
+                <span
+                  aria-hidden="true"
+                  class:list={[
+                    'relative rounded-full transition-transform duration-500 group-hover/etoile:scale-125 group-focus/etoile:scale-125',
+                    etoile.favori ? 'size-2.5 bg-or-clair shadow-[0_0_10px_rgba(244,223,160,0.9)]' : 'size-[7px] bg-lune shadow-[0_0_8px_rgba(209,196,233,0.9)]',
+                  ]}
+                />
+                <span class="sr-only">{texte.nom}</span>
+
+                <!-- Le nom, écrit à la main -->
+                <span
+                  aria-hidden="true"
+                  class:list={[
+                    'absolute bottom-1/2 font-manuscrite text-[max(1rem,6.2cqw)] leading-none whitespace-nowrap',
+                    etoile.cote === 'd' ? 'left-[calc(50%+0.5rem)]' : 'right-[calc(50%+0.5rem)]',
+                    etoile.favori ? 'text-or' : 'text-argent',
+                  ]}
+                >
+                  {texte.nom}
+                </span>
+
+                <!-- La bulle d'explication -->
+                <span
+                  id={bulleId}
+                  role="tooltip"
+                  class:list={[
+                    'pointer-events-none absolute bottom-[calc(100%+0.75rem)] z-30 w-60 translate-y-1 rounded-lg border border-lavande bg-surface-haute/95 px-4 py-3 text-left opacity-0 shadow-flottant transition duration-300',
+                    'group-hover/etoile:translate-y-0 group-hover/etoile:opacity-100 group-focus/etoile:translate-y-0 group-focus/etoile:opacity-100',
+                    etoile.cote === 'd' ? 'left-0' : 'right-0',
+                  ]}
+                >
+                  <span class="flex items-baseline justify-between gap-3">
+                    <span class="font-serif text-xl font-medium text-lune">{texte.nom}</span>
+                    {etoile.favori && (
+                      <span class="flex items-center gap-1.5 text-[0.65rem] tracking-wider text-or uppercase">
+                        <span class="size-1.5 rounded-full bg-or-clair shadow-[0_0_6px_rgba(244,223,160,0.8)]" />
+                        {textes.coupDeCoeur}
+                      </span>
+                    )}
+                  </span>
+                  <span class="mt-1 block text-sm leading-snug text-argent">{texte.description}</span>
+                </span>
+              </button>
+            </li>
+          );
+        })
+      }
+    </ul>
+  </div>
+
+  <figcaption class="flex flex-col items-center gap-1">
+    <span class="font-serif text-2xl font-medium text-lune italic md:text-3xl">{textes.familles[constellation.cle]}</span>
+  </figcaption>
+</figure>

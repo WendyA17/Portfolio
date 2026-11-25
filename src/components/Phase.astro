@@ -14,7 +14,7 @@ const { id, numero, total, lune, titre } = Astro.props;
 const deuxChiffres = (n: number) => String(n).padStart(2, '0'); // 1 → « 01 »
 ---
 
-<section id={id} class="relative flex min-h-dvh snap-start flex-col pt-28 pb-8 court:pt-24 court:pb-4">
+<section id={id} class="relative flex min-h-dvh snap-start flex-col overflow-x-clip pt-28 pb-8 court:pt-24 court:pb-4">
   <!-- Ligne du haut : la phase à gauche, un emplacement libre à droite.
        max-w-7xl + px-5 md:px-12 : les mêmes marges que le header,
        pour que tout soit aligné -->
