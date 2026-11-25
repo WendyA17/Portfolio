@@ -84,6 +84,7 @@ linear-gradient(to bottom, transparent, rgba(209, 196, 233, 0.6), transparent) c
     color-scheme: dark;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    scroll-behavior: smooth;
   }
 
   body {

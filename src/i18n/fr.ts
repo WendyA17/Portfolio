@@ -24,6 +24,9 @@ const fr = {
     contact: { lune: 'Dernier quartier', titre: 'Contact' },
     fin: { lune: 'Dernier croissant', titre: 'Fin du cycle' },
   },
+  navigation: {
+  libelle: 'Les phases du portfolio',
+},
 };
 
 export default fr;
