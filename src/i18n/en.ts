@@ -37,6 +37,26 @@ ouverture: {
   },
   defiler: 'Scroll down',
 },
+histoire: {
+  titre: 'A passion awakened between design and code.',
+  paragraphes: [
+    'I’m Wendy Asmatico, a creative web developer. Between careful design and rigorous code, I build interfaces that are both beautiful and effective.',
+    'I love meaningful projects: understanding what drives you, then turning it into a clear, fast and pleasant experience, crafted down to the smallest detail.',
+  ],
+  valeurs: [
+    { titre: 'Creativity', texte: 'Every project is a chance to invent a unique experience.' },
+    { titre: 'Care', texte: 'Typography, accessibility, performance: it all comes down to details.' },
+    { titre: 'Listening', texte: 'Building projects together that reflect who we are.' },
+  ],
+  fiche: [
+    { label: 'Based in', valeur: 'Marseille' },
+    { label: 'Languages', valeur: 'French · English' },
+    { label: 'Interests', valeur: 'Code · Design' },
+  ],
+  photoAlt: 'Portrait of Wendy Asmatico',
+  photoLegende: 'Creative web developer',
+  lien: 'Discover my skills',
+},
 };
 
 export default en;

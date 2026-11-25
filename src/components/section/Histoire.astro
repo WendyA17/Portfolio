@@ -1,0 +1,88 @@
+---
+// Phase 02 · Premier croissant — « Mon histoire »
+import Phase from '../Phase.astro';
+import Lune from '../Lune.astro';
+import Polaroid from '../Polaroid.astro';
+import { traductions, type Langue } from '../../i18n/utils';
+import maPhoto from '../../assets/wendy.png';
+interface Props {
+  langue: Langue;
+  numero: number;
+  total: number;
+}
+
+const { langue, numero, total } = Astro.props;
+const t = traductions(langue);
+const h = t.histoire;
+---
+
+<Phase id="histoire" numero={numero} total={total} lune={t.phases.histoire.lune} titre={t.phases.histoire.titre}>
+  <div class="grid w-full max-w-6xl items-center gap-12 text-left md:grid-cols-[minmax(0,17rem)_1fr] md:gap-16 lg:gap-24">
+
+    <!-- Colonne de gauche : la photo et quelques infos -->
+    <div class="mx-auto flex w-full max-w-60 flex-col items-center gap-8 md:max-w-none court:gap-5">
+      <Polaroid
+        photo={maPhoto}
+        format="carre"
+        alt={h.photoAlt}
+        legende="Wendy Asmatico"
+        sousLegende={h.photoLegende}
+        class="w-44 sm:w-52 md:w-full court:md:w-52"
+      />
+
+      <dl class="grid w-full gap-3 text-sm court:gap-2">
+        {
+          h.fiche.map((info) => (
+            <div class="flex items-baseline justify-between gap-4 border-b border-bordure/70 pb-2">
+              <dt class="text-xs tracking-wider text-lavande-claire uppercase">{info.label}</dt>
+              <dd class="text-right text-argent">{info.valeur}</dd>
+            </div>
+          ))
+        }
+      </dl>
+    </div>
+
+    <!-- Colonne de droite : le récit -->
+    <div class="flex flex-col gap-6 court:gap-4">
+      <div class="flex items-center gap-4">
+        <Lune phase={0.125} class="size-12 md:size-14" eclat={0.8} />
+        <p class="text-xs tracking-[0.2em] text-lavande-claire uppercase">
+          {t.phases.histoire.titre}
+        </p>
+      </div>
+
+      <h2 class="font-serif text-4xl leading-tight font-medium tracking-tight md:text-5xl lg:text-6xl court:lg:text-5xl">
+        {h.titre}
+      </h2>
+
+      <div class="flex max-w-2xl flex-col gap-4 text-base leading-relaxed text-argent md:text-lg court:md:text-base">
+        {h.paragraphes.map((texte) => <p>{texte}</p>)}
+      </div>
+
+      <!-- Ce qui me guide : trois valeurs -->
+      <ul class="grid gap-3 sm:grid-cols-3">
+        {
+          h.valeurs.map((valeur) => (
+            <li class="rounded-lg border border-bordure bg-surface/60 p-4 backdrop-blur-sm court:p-3">
+              <p class="flex items-center gap-2 font-serif text-xl font-medium text-lune">
+                <span aria-hidden="true" class="eclat size-4 shrink-0" />
+                {valeur.titre}
+              </p>
+              <p class="mt-1.5 text-sm leading-snug text-lavande-claire">{valeur.texte}</p>
+            </li>
+          ))
+        }
+      </ul>
+
+      <a
+        href="#competences"
+        class="group flex w-fit items-center gap-2 text-xs font-semibold tracking-[0.2em] text-lavande-claire uppercase transition-colors duration-300 hover:text-lune"
+      >
+        {h.lien}
+        <svg class="size-4 transition-transform duration-300 group-hover:translate-x-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <path d="M5 12h14m-6-6 6 6-6 6"></path>
+        </svg>
+      </a>
+    </div>
+  </div>
+</Phase>

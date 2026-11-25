@@ -40,6 +40,26 @@ ouverture: {
   },
   defiler: 'Faites défiler',
 },
+histoire: {
+  titre: 'L’éveil d’une passion entre création et code.',
+  paragraphes: [
+    'Je suis Wendy Asmatico, développeuse web créative. Entre le soin du design et la rigueur du code, je conçois des interfaces qui allient beauté et efficacité.',
+    'J’aime les projets qui ont du sens : comprendre ce qui vous anime, puis le traduire en une expérience claire, rapide et agréable, pensée dans ses moindres détails.',
+  ],
+  valeurs: [
+    { titre: 'Créativité', texte: 'Chaque projet est l’occasion d’inventer une expérience singulière.' },
+    { titre: 'Soin', texte: 'Typographie, accessibilité, performance : tout se joue dans les détails.' },
+    { titre: 'Écoute', texte: 'Construire ensemble des projets qui nous ressemblent.' },
+  ],
+  fiche: [
+    { label: 'Basée à', valeur: 'Marseille' },
+    { label: 'Langues', valeur: 'Français · Anglais' },
+    { label: 'Curiosités', valeur: 'Code · Design' },
+  ],
+  photoAlt: 'Portrait de Wendy Asmatico',
+  photoLegende: 'Développeuse web créative',
+  lien: 'Découvrir mes compétences',
+},
 };
 
 export default fr;
