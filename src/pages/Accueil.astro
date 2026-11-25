@@ -4,6 +4,7 @@
 import Layout from '../layouts/Layout.astro';
 import Header from '../components/Header.astro';
 import Phase from '../components/Phase.astro';
+import Ouverture from '../components/section/Ouverture.astro';
 import NavigationLunaire from '../components/NavigationLunaire.astro';
 import { traductions, type Langue } from '../i18n/utils';
 
@@ -14,18 +15,21 @@ interface Props {
 const { langue } = Astro.props;
 const t = traductions(langue);
 
-// L'ordre des sections. Les textes viennent du fichier de traduction.
-const ordre = ['accueil', 'histoire', 'competences', 'projets', 'etude', 'parcours', 'contact', 'fin'] as const;
+// Les sections encore vides : on les remplacera une par une par leur vrai composant
+const aRemplir = ['histoire', 'competences', 'projets', 'etude', 'parcours', 'contact', 'fin'] as const;
+const total = aRemplir.length + 1;
 ---
 
 <Layout langue={langue} snap>
   <Header langue={langue} />
-  <NavigationLunaire langue={langue} sections={ordre} />
+  <NavigationLunaire langue={langue} sections={['accueil', ...aRemplir]} />
 
   <main>
+    <Ouverture langue={langue} numero={1} total={total} />
+
     {
-      ordre.map((id, index) => (
-        <Phase id={id} numero={index + 1} lune={t.phases[id].lune}>
+      aRemplir.map((id, index) => (
+        <Phase id={id} numero={index + 2} total={total} lune={t.phases[id].lune} titre={t.phases[id].titre}>
           <h2 class="font-serif text-5xl font-medium md:text-7xl">{t.phases[id].titre}</h2>
         </Phase>
       ))

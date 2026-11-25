@@ -27,6 +27,19 @@ const fr = {
   navigation: {
   libelle: 'Les phases du portfolio',
 },
+ouverture: {
+  role: 'Développement créatif & architecture frontend',
+  sousTitre: 'Développeuse web créative & architecte frontend',
+  citation: '« Tisser la poésie du code sous la lueur de la lune pour façonner des projets concrets, créatifs et qui nous ressemblent. »',
+  boutonProjets: 'Explorer les constellations',
+  boutonCycle: 'Entrer dans le cycle',
+  portfolio: 'Portfolio 2026',
+  statut: {
+    disponible: 'Disponible',
+    enPoste: 'En poste · ouverte aux échanges',
+  },
+  defiler: 'Faites défiler',
+},
 };
 
 export default fr;

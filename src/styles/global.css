@@ -75,6 +75,8 @@ radial-gradient(circle, var(--color-lune) 0 3px, rgba(209, 196, 233, 0.5) 4px, t
 linear-gradient(to right, transparent, rgba(209, 196, 233, 0.6), transparent) center / 100% 1px no-repeat,
 linear-gradient(to bottom, transparent, rgba(209, 196, 233, 0.6), transparent) center / 1px 100% no-repeat;
 }
+@custom-variant court (@media (max-height: 860px));
+@custom-variant haut (@media (min-width: 768px) and (min-height: 700px));
 
 @layer base {
   html {

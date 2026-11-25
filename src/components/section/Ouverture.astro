@@ -1,0 +1,89 @@
+---
+// Phase 01 · Nouvelle lune — la section d'ouverture du portfolio
+import Phase from '../Phase.astro';
+import Lune from '../Lune.astro';
+import { traductions, type Langue } from '../../i18n/utils';
+import { statut } from '../../config';
+
+interface Props {
+  langue: Langue;
+  numero: number;
+  total: number;
+}
+
+const { langue, numero, total } = Astro.props;
+const t = traductions(langue);
+---
+
+<Phase id="accueil" numero={numero} total={total} lune={t.phases.accueil.lune} titre={t.phases.accueil.titre}>
+  <!-- En haut à droite : l'année et ta situation (réglée dans src/config.ts) -->
+  <p slot="haut" class="flex items-center gap-3 text-xs tracking-wider uppercase">
+    <span class="hidden sm:inline">{t.ouverture.portfolio}</span>
+    {
+      statut === 'disponible' && (
+        <span class="flex items-center gap-2 font-semibold text-emerald-300">
+          <span class="size-2 animate-pulse rounded-full bg-emerald-300" />
+          {t.ouverture.statut.disponible}
+        </span>
+      )
+    }
+    {
+      statut === 'enPoste' && (
+        <span class="flex items-center gap-2 font-semibold text-argent">
+          <span class="size-2 rounded-full bg-argent shadow-[0_0_8px_rgba(209,196,233,0.8)]" />
+          <span class="hidden sm:inline">{t.ouverture.statut.enPoste}</span>
+          <span class="sm:hidden">{t.ouverture.statut.enPoste.split(' · ')[0]}</span>
+        </span>
+      )
+    }
+  </p>
+
+  <!-- La lune de la phase 01 : la nouvelle lune, en contre-jour -->
+<Lune phase={0} class="mb-10 size-32 md:mb-12 md:size-48 court:mb-6 court:size-24 court:md:mb-6 court:md:size-36" />
+
+  <p class="mb-5 text-xs tracking-[0.3em] text-lavande-claire uppercase court:mb-3 md:text-sm">
+    {t.ouverture.role}
+  </p>
+
+  <h1 class="font-serif text-[2.6rem] leading-none font-medium tracking-tight min-[360px]:text-5xl sm:text-7xl lg:text-8xl court:md:text-6xl">
+    Wendy Asmatico
+  </h1>
+
+  <p class="mt-5 text-base text-argent court:mt-3 md:text-lg">{t.ouverture.sousTitre}</p>
+
+  <p class="mt-6 max-w-2xl font-serif text-xl leading-relaxed text-lavande-claire italic court:mt-3 md:text-2xl court:md:text-xl">
+    {t.ouverture.citation}
+  </p>
+
+  <div class="mt-10 flex flex-col gap-3 court:mt-6 sm:flex-row sm:gap-4">
+    <a
+      href="#projets"
+      class="flex items-center justify-center gap-3 rounded-full bg-lavande px-5 py-3.5 text-xs font-semibold tracking-wide sm:px-7 sm:text-sm sm:tracking-wider text-lune uppercase shadow-astre transition-[background-color,box-shadow] duration-300 hover:bg-lavande-vive hover:shadow-[0_0_24px_rgba(120,97,143,0.6)]"
+    >
+      {t.ouverture.boutonProjets}
+      <!-- Icône boussole -->
+      <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <circle cx="12" cy="12" r="9"></circle>
+        <path d="m15.5 8.5-2 5-5 2 2-5z"></path>
+      </svg>
+    </a>
+    <a
+      href="#histoire"
+      class="flex items-center justify-center gap-3 rounded-full border border-bordure px-5 py-3.5 text-xs font-medium tracking-wide sm:px-7 sm:text-sm sm:tracking-wider text-lavande-claire uppercase transition-colors duration-300 hover:border-lavande hover:text-lune"
+    >
+      {t.ouverture.boutonCycle}
+      <!-- Icône flèche vers le bas -->
+      <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <path d="M12 5v14m-6-6 6 6 6-6"></path>
+      </svg>
+    </a>
+  </div>
+
+  <!-- En bas à droite : invitation à défiler -->
+  <p slot="bas" class="hidden items-center gap-2 normal-case sm:flex">
+    {t.ouverture.defiler}
+    <svg class="size-4 animate-bounce" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+      <path d="M12 5v14m-6-6 6 6 6-6"></path>
+    </svg>
+  </p>
+</Phase>

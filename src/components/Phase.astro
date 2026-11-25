@@ -1,27 +1,39 @@
 ---
-// Une « phase » = une section plein écran du portfolio
+// Une « phase » = une section plein écran du portfolio.
+// Elle affiche les repères communs à toutes les sections
+// (numéro, phase lunaire, compteur) et le contenu au centre.
 interface Props {
   id: string;      // l'ancre de la section, ex. « projets » → monsite.fr/#projets
   numero: number;  // 1 à 8
+  total: number;   // nombre total de phases
   lune: string;    // le nom de la phase lunaire
+  titre: string;   // le titre court, affiché dans le compteur
 }
 
-const { id, numero, lune } = Astro.props;
-const numeroAffiche = String(numero).padStart(2, '0'); // 1 → « 01 »
+const { id, numero, total, lune, titre } = Astro.props;
+const deuxChiffres = (n: number) => String(n).padStart(2, '0'); // 1 → « 01 »
 ---
 
-<section
-  id={id}
-  class="relative flex min-h-dvh snap-start flex-col px-5 pt-28 pb-12 md:px-12"
->
-  <!-- Repère de la phase, en haut à gauche -->
-  <p class="text-sm text-lavande-claire">
-    <span class="font-serif text-lg italic">{numeroAffiche}</span>
-    <span class="ml-2">{lune}</span>
-  </p>
+<section id={id} class="relative flex min-h-dvh snap-start flex-col pt-28 pb-8 court:pt-24 court:pb-4">
+  <!-- Ligne du haut : la phase à gauche, un emplacement libre à droite.
+       max-w-7xl + px-5 md:px-12 : les mêmes marges que le header,
+       pour que tout soit aligné -->
+  <div class="mx-auto flex w-full max-w-7xl items-start px-5 md:px-12 justify-between gap-4 text-sm text-lavande-claire">
+    <p>
+      <span class="font-serif text-xl font-medium italic">{deuxChiffres(numero)}</span>
+      <span class="ml-2">{lune}</span>
+    </p>
+    <slot name="haut" />
+  </div>
 
-  <!-- Le contenu de la section -->
-  <div class="flex flex-1 flex-col items-center justify-center text-center">
+  <!-- Le contenu de la section, centré -->
+  <div class="mx-auto flex w-full max-w-7xl flex-1 flex-col items-center justify-center px-5 py-10 text-center court:py-4 md:px-12">
     <slot />
+  </div>
+
+  <!-- Ligne du bas : le compteur à gauche, un emplacement libre à droite -->
+  <div class="mx-auto flex w-full max-w-7xl items-end px-5 md:px-12 justify-between gap-4 text-xs tracking-wider text-lavande-claire uppercase">
+    <p>{deuxChiffres(numero)} / {deuxChiffres(total)} — {titre}</p>
+    <slot name="bas" />
   </div>
 </section>

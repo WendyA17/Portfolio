@@ -24,6 +24,19 @@ const en: Dictionnaire = {
   navigation: {
   libelle: 'Portfolio phases',
 },
+ouverture: {
+  role: 'Creative development & frontend architecture',
+  sousTitre: 'Creative web developer & frontend architect',
+  citation: '“Weaving the poetry of code by moonlight to shape concrete, creative projects that reflect who we are.”',
+  boutonProjets: 'Explore the constellations',
+  boutonCycle: 'Enter the cycle',
+  portfolio: 'Portfolio 2026',
+  statut: {
+    disponible: 'Open to work',
+    enPoste: 'Currently employed · happy to connect',
+  },
+  defiler: 'Scroll down',
+},
 };
 
 export default en;
