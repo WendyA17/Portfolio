@@ -16,7 +16,7 @@ const fr = {
   // Une entrée par section de l'accueil : le nom de la phase lunaire et le titre
   phases: {
     accueil: { lune: 'Nouvelle lune', titre: 'Accueil' },
-    histoire: { lune: 'Premier croissant', titre: 'Mon histoire' },
+    histoire: { lune: 'Premier croissant', titre: 'Présentation' },
     competences: { lune: 'Premier quartier', titre: 'Compétences' },
     projets: { lune: 'Gibbeuse croissante', titre: 'Projets' },
     etude: { lune: 'Pleine lune', titre: 'Étude de cas' },
@@ -39,6 +39,17 @@ ouverture: {
     enPoste: 'En poste · ouverte aux échanges',
   },
   defiler: 'Faites défiler',
+},
+histoire: {
+  journal: 'Journal d’observation',
+  titre: 'L’éveil d’une passion entre création et code.',
+  paragraphe: 'Je suis Wendy, développeuse web créative. Entre design soigné et code rigoureux, je façonne des projets concrets, créatifs et qui nous ressemblent. Et quand je ne code pas, je voyage dans d’autres mondes.',
+  domainesLabel: 'Mes domaines',
+  domaines: ['Développement web', 'Design d’interface'],
+  passions: { jeu: 'jeu vidéo', lecture: 'lecture', dessin: 'dessin' },
+  legende: 'ce qui gravite autour de moi…',
+  avatarAlt: 'Avatar illustré de Wendy Asmatico',
+  lien: 'Découvrir mes compétences',
 },
 };
 

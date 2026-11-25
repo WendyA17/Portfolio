@@ -13,7 +13,7 @@ const en: Dictionnaire = {
   },
   phases: {
     accueil: { lune: 'New moon', titre: 'Home' },
-    histoire: { lune: 'Waxing crescent', titre: 'My story' },
+    histoire: { lune: 'Waxing crescent', titre: 'Presentation' },
     competences: { lune: 'First quarter', titre: 'Skills' },
     projets: { lune: 'Waxing gibbous', titre: 'Projects' },
     etude: { lune: 'Full moon', titre: 'Case study' },
@@ -36,6 +36,17 @@ ouverture: {
     enPoste: 'Currently employed · happy to connect',
   },
   defiler: 'Scroll down',
+},
+histoire: {
+  journal: 'Observation log',
+  titre: 'A passion awakened between design and code.',
+  paragraphe: 'I’m Wendy, a creative web developer. Between careful design and rigorous code, I shape concrete, creative projects that reflect who we are. And when I’m not coding, I travel to other worlds.',
+  domainesLabel: 'My fields',
+  domaines: ['Web development', 'Interface design'],
+  passions: { jeu: 'video games', lecture: 'reading', dessin: 'drawing' },
+  legende: 'what orbits around me…',
+  avatarAlt: 'Illustrated avatar of Wendy Asmatico',
+  lien: 'Discover my skills',
 },
 };
 

@@ -6,6 +6,7 @@ import Header from '../components/Header.astro';
 import Phase from '../components/Phase.astro';
 import Ouverture from '../components/section/Ouverture.astro';
 import NavigationLunaire from '../components/NavigationLunaire.astro';
+import Histoire from '../components/section/Histoire.astro';
 import { traductions, type Langue } from '../i18n/utils';
 
 interface Props {
@@ -16,20 +17,21 @@ const { langue } = Astro.props;
 const t = traductions(langue);
 
 // Les sections encore vides : on les remplacera une par une par leur vrai composant
-const aRemplir = ['histoire', 'competences', 'projets', 'etude', 'parcours', 'contact', 'fin'] as const;
-const total = aRemplir.length + 1;
+const aRemplir = ['competences', 'projets', 'etude', 'parcours', 'contact', 'fin'] as const;
+const total = aRemplir.length + 2;
 ---
 
 <Layout langue={langue} snap>
   <Header langue={langue} />
-  <NavigationLunaire langue={langue} sections={['accueil', ...aRemplir]} />
+  <NavigationLunaire langue={langue} sections={['accueil', 'histoire', ...aRemplir]} />
 
   <main>
     <Ouverture langue={langue} numero={1} total={total} />
+    <Histoire langue={langue} numero={2} total={total} />
 
     {
       aRemplir.map((id, index) => (
-        <Phase id={id} numero={index + 2} total={total} lune={t.phases[id].lune} titre={t.phases[id].titre}>
+        <Phase id={id} numero={index + 3} total={total} lune={t.phases[id].lune} titre={t.phases[id].titre}>
           <h2 class="font-serif text-5xl font-medium md:text-7xl">{t.phases[id].titre}</h2>
         </Phase>
       ))

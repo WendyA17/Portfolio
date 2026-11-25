@@ -1,0 +1,80 @@
+---
+// Phase 02 · Premier croissant — « Mon histoire »
+// À gauche : qui tu es (ton avatar en éclipse, tes passions en orbite)
+// À droite : ce que tu fais (le récit et tes domaines)
+import Phase from '../Phase.astro';
+import Lune from '../Lune.astro';
+import OrbitePassions from '../OrbitePassions.astro';
+import maPhoto from '../../assets/wendy.png';
+import { traductions, type Langue } from '../../i18n/utils';
+
+interface Props {
+  langue: Langue;
+  numero: number;
+  total: number;
+}
+
+const { langue, numero, total } = Astro.props;
+const t = traductions(langue);
+const h = t.histoire;
+const numeroAffiche = String(numero).padStart(2, '0');
+
+// Une icône par domaine
+const icones = [
+  'm8 7-5 5 5 5M16 7l5 5-5 5',                      // code
+  'M12 3l7 7-7 11-7-11zM12 9.4a1.6 1.6 0 1 0 0 3.2a1.6 1.6 0 1 0 0-3.2', // plume
+];
+---
+
+<Phase id="histoire" numero={numero} total={total} lune={t.phases.histoire.lune} titre={t.phases.histoire.titre}>
+  <div class="grid w-full max-w-6xl items-center gap-10 text-left md:grid-cols-2 md:gap-12 lg:gap-20">
+
+    <!-- Colonne de gauche : l'éclipse et les passions -->
+    <OrbitePassions photo={maPhoto} alt={h.avatarAlt} passions={h.passions} legende={h.legende} />
+
+    <!-- Colonne de droite : le récit -->
+    <div class="flex flex-col gap-6 court:gap-4">
+      <!-- Le journal d'observation, avec la lune en premier croissant -->
+      <div class="flex items-center gap-5">
+        <Lune phase={0.125} class="size-14 md:size-[4.75rem] court:md:size-14" eclat={0.9} contreJour={0.6} />
+        <p class="flex flex-col gap-1">
+          <span class="text-xs font-medium tracking-[0.24em] text-argent uppercase">{h.journal}</span>
+          <span class="font-serif text-2xl text-lune italic">Phase {numeroAffiche} — {t.phases.histoire.lune}</span>
+        </p>
+      </div>
+
+      <h2 class="font-serif text-4xl leading-[1.05] font-medium tracking-tight md:text-5xl lg:text-6xl court:lg:text-5xl">
+        {h.titre}
+      </h2>
+
+      <p class="max-w-xl text-base leading-relaxed text-argent md:text-lg">{h.paragraphe}</p>
+
+      <!-- Mes domaines, sur une ligne -->
+      <ul aria-label={h.domainesLabel} class="flex flex-wrap items-center gap-x-5 gap-y-2 border-y border-bordure/80 py-3.5">
+        {
+          h.domaines.map((domaine, i) => (
+            <>
+              {i > 0 && <li aria-hidden="true" class="hidden text-lavande sm:block">✦</li>}
+              <li class="flex items-center gap-2.5 font-serif text-2xl font-medium">
+                <svg class="size-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="#d1c4e9" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d={icones[i % icones.length]} />
+                </svg>
+                {domaine}
+              </li>
+            </>
+          ))
+        }
+      </ul>
+
+      <a
+        href="#competences"
+        class="group flex w-fit items-center gap-2 text-xs font-semibold tracking-[0.2em] text-lavande-claire uppercase transition-colors duration-300 hover:text-lune"
+      >
+        {h.lien}
+        <svg class="size-4 transition-transform duration-300 group-hover:translate-x-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <path d="M5 12h14m-6-6 6 6-6 6"></path>
+        </svg>
+      </a>
+    </div>
+  </div>
+</Phase>
