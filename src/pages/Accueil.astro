@@ -1,0 +1,32 @@
+---
+// La page d'accueil, écrite une seule fois pour toutes les langues.
+// src/pages/index.astro l'affiche en français, src/pages/en/index.astro en anglais.
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import Phase from '../components/Phase.astro';
+import { traductions, type Langue } from '../i18n/utils';
+
+interface Props {
+  langue: Langue;
+}
+
+const { langue } = Astro.props;
+const t = traductions(langue);
+
+// L'ordre des sections. Les textes viennent du fichier de traduction.
+const ordre = ['accueil', 'histoire', 'competences', 'projets', 'etude', 'parcours', 'contact', 'fin'] as const;
+---
+
+<Layout langue={langue} snap>
+  <Header langue={langue} />
+
+  <main>
+    {
+      ordre.map((id, index) => (
+        <Phase id={id} numero={index + 1} lune={t.phases[id].lune}>
+          <h2 class="font-serif text-5xl font-medium md:text-7xl">{t.phases[id].titre}</h2>
+        </Phase>
+      ))
+    }
+  </main>
+</Layout>
