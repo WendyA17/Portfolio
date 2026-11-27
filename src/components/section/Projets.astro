@@ -1,0 +1,119 @@
+---
+// Phase 04 · Gibbeuse croissante — « Projets » : la galerie des cartes du ciel
+import { getCollection } from 'astro:content';
+import Phase from '../Phase.astro';
+import Lune from '../Lune.astro';
+import CarteCiel from '../CarteCiel.astro';
+import { constellations } from '../../data/competence';
+import { traductions, type Langue } from '../../i18n/utils';
+
+interface Props {
+  langue: Langue;
+  numero: number;
+  total: number;
+}
+
+const { langue, numero, total } = Astro.props;
+const t = traductions(langue);
+const pr = t.projets;
+const numeroAffiche = String(numero).padStart(2, '0');
+
+// Les projets de la langue affichée, dans l'ordre choisi
+const projets = (await getCollection('projets', ({ id }) => id.startsWith(`${langue}/`))).sort(
+  (a, b) => a.data.ordre - b.data.ordre,
+);
+
+// Tes coups de cœur (les étoiles dorées de tes constellations)
+const favoris = constellations
+  .flatMap((c) => c.etoiles)
+  .filter((e) => e.favori)
+  .map((e) => t.competences.etoiles[e.cle].nom);
+
+const compte = {
+  tous: projets.length,
+  site: projets.filter((p) => p.data.categorie === 'site').length,
+  creation: projets.filter((p) => p.data.categorie === 'creation').length,
+};
+const filtres = ['tous', 'site', 'creation'] as const;
+---
+
+<Phase id="projets" numero={numero} total={total} lune={t.phases.projets.lune} titre={t.phases.projets.titre}>
+  <div class="flex w-full max-w-6xl flex-col gap-8 text-left court:gap-5">
+
+    <!-- En-tête : journal, titre, filtres -->
+    <div class="flex flex-col justify-between gap-6 md:flex-row md:items-end">
+      <div class="flex flex-col gap-5 court:gap-3">
+        <div class="flex items-center gap-5">
+          <Lune phase={0.375} class="size-14 court:size-12" eclat={0.9} contreJour={0.3} />
+          <p class="flex flex-col gap-1">
+            <span class="text-xs font-medium tracking-[0.24em] text-argent uppercase">{pr.journal}</span>
+            <span class="font-serif text-2xl text-lune italic">Phase {numeroAffiche} — {t.phases.projets.lune}</span>
+          </p>
+        </div>
+        <h2 class="font-serif text-4xl leading-none font-medium tracking-tight md:text-6xl court:md:text-5xl">{pr.titre}</h2>
+      </div>
+
+      <div class="flex flex-col gap-4 md:items-end">
+      <p class="max-w-md text-base text-argent md:text-right">{pr.intro}</p>
+      <div role="group" aria-label={pr.filtreLabel} class="flex w-fit gap-1 rounded-full border border-bordure bg-nuit/60 p-1 sm:gap-1.5 sm:p-1.5">
+        {
+          filtres.map((f, i) => (
+            <button
+              type="button"
+              data-filtre={f}
+              aria-pressed={i === 0 ? 'true' : 'false'}
+              class="group/filtre flex items-center gap-1.5 rounded-full px-3 py-2 text-xs whitespace-nowrap sm:gap-2 sm:px-4 sm:text-sm text-lavande-claire transition-colors hover:text-lune aria-pressed:bg-lavande aria-pressed:font-semibold aria-pressed:text-lune aria-pressed:shadow-astre"
+            >
+              <span aria-hidden="true" class="group-aria-pressed/filtre:text-or-clair">✦</span>
+              {pr.filtres[f]}
+              <span class="opacity-60">{compte[f]}</span>
+            </button>
+          ))
+        }
+      </div>
+      </div>
+    </div>
+
+    <!-- Les cartes : défilement horizontal sur mobile, grille sur grand écran -->
+    <ul
+      data-galerie
+      class="-mx-5 flex snap-x snap-mandatory gap-5 overflow-x-auto px-5 pt-4 pb-6 [scrollbar-width:none] court:pt-2 court:pb-2 *:w-56 md:mx-0 md:grid md:grid-cols-[repeat(auto-fill,minmax(12.5rem,1fr))] md:overflow-visible md:px-0 md:*:w-auto court:md:grid-cols-[repeat(auto-fill,minmax(11rem,1fr))]"
+    >
+      {projets.map((projet, i) => <CarteCiel projet={projet} numero={i + 1} textes={pr} favoris={favoris} />)}
+    </ul>
+  </div>
+</Phase>
+
+<script>
+  // ── Clic sur une carte ──
+  // À la souris (la carte est déjà retournée au survol) : on ouvre sa fiche.
+  // Au toucher : on retourne la carte, la fiche s'ouvre avec son bouton.
+  const avecSouris = window.matchMedia('(hover: hover)');
+  document.querySelectorAll<HTMLButtonElement>('[data-retourner]').forEach((bouton) => {
+    bouton.addEventListener('click', () => {
+      if (avecSouris.matches && bouton.dataset.fiche) {
+        location.hash = bouton.dataset.fiche;
+        return;
+      }
+      const carte = bouton.closest('.carte-ciel');
+      if (!carte) return;
+      const retournee = carte.toggleAttribute('data-retournee');
+      bouton.setAttribute('aria-expanded', String(retournee));
+    });
+  });
+
+  // ── Filtrer les cartes ──
+  const boutons = document.querySelectorAll<HTMLButtonElement>('[data-filtre]');
+  const cartes = document.querySelectorAll<HTMLElement>('.carte-ciel');
+
+  boutons.forEach((bouton) => {
+    bouton.addEventListener('click', () => {
+      const filtre = bouton.dataset.filtre;
+      boutons.forEach((b) => b.setAttribute('aria-pressed', String(b === bouton)));
+      cartes.forEach((carte) => {
+        const visible = filtre === 'tous' || carte.dataset.categorie === filtre;
+        carte.hidden = !visible;
+      });
+    });
+  });
+</script>

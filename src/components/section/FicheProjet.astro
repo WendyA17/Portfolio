@@ -1,0 +1,226 @@
+---
+// ─────────────────────────────────────────────────────────────
+// Phase 05 · Pleine lune — la fiche détaillée d'un projet,
+// présentée comme une fiche produit.
+// Toutes les fiches sont écrites dans la page, mais une seule
+// est visible : celle du projet choisi dans la galerie.
+// L'adresse suit le projet affiché (ex. monsite.fr/#projet-marsai),
+// donc on peut partager le lien d'un projet précis.
+// ─────────────────────────────────────────────────────────────
+import { getCollection, render } from 'astro:content';
+import { Image } from 'astro:assets';
+import Phase from '../Phase.astro';
+import Lune from '../Lune.astro';
+import { constellations } from '../../data/competence';
+import { traductions, type Langue } from '../../i18n/utils';
+
+interface Props {
+  langue: Langue;
+  numero: number;
+  total: number;
+}
+
+const { langue, numero, total } = Astro.props;
+const t = traductions(langue);
+const f = t.fiche;
+const numeroAffiche = String(numero).padStart(2, '0');
+
+const projets = (await getCollection('projets', ({ id }) => id.startsWith(`${langue}/`))).sort(
+  (a, b) => a.data.ordre - b.data.ordre,
+);
+
+// Le projet affiché au départ :
+// 1. celui marqué « aLaUne: true » dans sa fiche, s'il y en a un ;
+// 2. sinon, ton site web le plus récent (année la plus haute) ;
+// 3. sinon, le premier projet de la galerie.
+const sitesRecents = projets
+  .filter((p) => p.data.categorie === 'site')
+  .sort((a, b) => b.data.annee - a.data.annee || a.data.ordre - b.data.ordre);
+const parDefaut = projets.find((p) => p.data.aLaUne) ?? sitesRecents[0] ?? projets[0];
+
+const favoris = constellations
+  .flatMap((c) => c.etoiles)
+  .filter((e) => e.favori)
+  .map((e) => t.competences.etoiles[e.cle].nom);
+
+// On prépare chaque fiche : son identifiant, ses images, son texte
+const fiches = await Promise.all(
+  projets.map(async (projet, i) => {
+    const slug = projet.id.split('/').slice(1).join('/');
+    const { Content } = await render(projet);
+    const suivant = projets[(i + 1) % projets.length];
+    const precedent = projets[(i - 1 + projets.length) % projets.length];
+    const versSlug = (p: typeof projet) => p.id.split('/').slice(1).join('/');
+    return {
+      projet,
+      slug,
+      Content,
+      images: [projet.data.couverture, ...projet.data.images],
+      suivant: versSlug(suivant),
+      precedent: versSlug(precedent),
+    };
+  }),
+);
+---
+
+<Phase id="etude" numero={numero} total={total} lune={t.phases.etude.lune} titre={t.phases.etude.titre}>
+  <div class="w-full max-w-6xl text-left">
+    {
+      fiches.map(({ projet, slug, Content, images, suivant, precedent }) => {
+        const p = projet.data;
+        return (
+          <article
+            id={`projet-${slug}`}
+            data-fiche-projet
+            data-masque={projet.id !== parDefaut.id ? '' : undefined}
+            class="grid data-masque:hidden scroll-mt-24 items-start gap-10 md:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] md:gap-14"
+          >
+            <!-- ── Colonne de gauche : les images ── -->
+            <div class="flex flex-col gap-3">
+              <div class="relative flex aspect-[4/3] items-center justify-center overflow-hidden rounded-2xl border border-lavande/60 bg-nuit-profonde shadow-flottant court:aspect-[16/10]">
+                <span aria-hidden="true" class="pointer-events-none absolute inset-[7px] z-10 rounded-xl border border-or/25" />
+                <Image
+                  src={images[0]}
+                  alt={p.titre}
+                  widths={[640, 1000, 1400]}
+                  sizes="(min-width: 768px) 600px, 100vw"
+                  data-image-principale
+                  class="size-full object-contain"
+                />
+              </div>
+
+              {images.length > 1 && (
+                <ul aria-label={f.images} class="flex gap-2">
+                  {images.map((image, i) => (
+                    <li>
+                      <button
+                        type="button"
+                        data-miniature
+                        aria-pressed={i === 0 ? 'true' : 'false'}
+                        class="block size-16 overflow-hidden rounded-lg border border-bordure opacity-60 transition hover:opacity-100 aria-pressed:border-or aria-pressed:opacity-100"
+                      >
+                        <Image src={image} alt="" widths={[128]} sizes="64px" class="size-full object-cover" data-grande={image.src} />
+                        <span class="sr-only">{f.afficherImage} {i + 1}</span>
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+
+            <!-- ── Colonne de droite : la fiche ── -->
+            <div class="flex flex-col gap-5 court:gap-3">
+              <div class="flex items-center gap-4">
+                <Lune phase={0.5} class="size-12" eclat={0.9} anime={false} />
+                <p class="flex flex-col gap-1">
+                  <span class="text-xs font-medium tracking-[0.24em] text-argent uppercase">{f.journal}</span>
+                  <span class="font-serif text-xl text-lune italic">Phase {numeroAffiche} — {t.phases.etude.lune}</span>
+                </p>
+              </div>
+
+              <div>
+                <p class="text-xs tracking-[0.2em] text-lavande-claire uppercase">
+                  {t.projets.categories[p.categorie]} · {p.type} · {p.annee}
+                </p>
+                <h2 class="mt-2 font-serif text-4xl leading-none font-medium tracking-tight md:text-5xl">{p.titre}</h2>
+              </div>
+
+              <p class="text-lg leading-relaxed text-argent court:text-base">{p.description}</p>
+
+              <!-- Rôle et technos, comme les caractéristiques d'un produit -->
+              <dl class="grid gap-4 border-y border-bordure/80 py-4 sm:grid-cols-[auto_1fr] sm:gap-x-8 court:py-3">
+                <dt class="text-xs tracking-[0.2em] text-lavande-claire uppercase sm:pt-1">{f.role}</dt>
+                <dd class="font-manuscrite text-2xl leading-none text-lune">{p.role}</dd>
+                <dt class="text-xs tracking-[0.2em] text-lavande-claire uppercase sm:pt-1.5">{f.technos}</dt>
+                <dd>
+                  <ul class="flex flex-wrap gap-1.5">
+                    {p.technos.map((techno) =>
+                      favoris.includes(techno) ? (
+                        <li class="rounded-full border border-or/50 px-3 py-1 text-xs text-or">✦ {techno}</li>
+                      ) : (
+                        <li class="rounded-full border border-bordure px-3 py-1 text-xs text-argent">{techno}</li>
+                      ),
+                    )}
+                  </ul>
+                </dd>
+              </dl>
+
+              <!-- Le texte détaillé, écrit dans la fiche Markdown -->
+              <details class="group/details">
+                <summary class="flex cursor-pointer list-none items-center gap-2 text-sm font-semibold text-lune">
+                  <span aria-hidden="true" class="text-or transition-transform group-open/details:rotate-90">✦</span>
+                  {f.aPropos}
+                </summary>
+                <div class="mt-3 max-h-56 overflow-y-auto pr-2 court:max-h-28 text-sm leading-relaxed text-argent [&_h2]:mt-4 [&_h2]:mb-1 [&_h2]:font-serif [&_h2]:text-xl [&_h2]:text-lune [&_h2:first-child]:mt-0 [&_li]:ml-4 [&_li]:list-disc [&_p]:mb-2 [&_strong]:text-lune">
+                  <Content />
+                </div>
+              </details>
+
+              <!-- Les actions -->
+              <div class="flex flex-wrap items-center gap-3">
+                {p.lien && (
+                  <a href={p.lien} target="_blank" rel="noopener" class="flex items-center gap-2 rounded-full bg-lavande px-6 py-3 text-sm font-semibold text-lune shadow-astre transition-colors hover:bg-lavande-vive">
+                    {f.voirSite} <span aria-hidden="true">↗</span>
+                    <span class="sr-only">({f.nouvelOnglet})</span>
+                  </a>
+                )}
+                {p.github && (
+                  <a href={p.github} target="_blank" rel="noopener" class="flex items-center gap-2 rounded-full border border-bordure px-6 py-3 text-sm font-medium text-lavande-claire transition-colors hover:border-lavande hover:text-lune">
+                    {f.voirCode} <span aria-hidden="true">↗</span>
+                    <span class="sr-only">({f.nouvelOnglet})</span>
+                  </a>
+                )}
+              </div>
+
+              <!-- Navigation entre les projets -->
+              <nav class="flex flex-wrap items-center justify-between gap-3 text-xs font-semibold tracking-[0.15em] text-lavande-claire uppercase">
+                <a href="#projets" class="transition-colors hover:text-lune">↑ {f.retour}</a>
+                <span class="flex gap-4">
+                  <a href={`#projet-${precedent}`} class="transition-colors hover:text-lune">← {f.precedent}</a>
+                  <a href={`#projet-${suivant}`} class="transition-colors hover:text-lune">{f.suivant} →</a>
+                </span>
+              </nav>
+            </div>
+          </article>
+        );
+      })
+    }
+  </div>
+</Phase>
+
+<!-- Sans JavaScript, toutes les fiches s'affichent les unes sous les autres -->
+<noscript>
+  <style>
+    [data-fiche-projet][data-masque] { display: grid !important; margin-top: 4rem; }
+  </style>
+</noscript>
+
+<script>
+  const fiches = document.querySelectorAll<HTMLElement>('[data-fiche-projet]');
+
+  // Affiche la fiche demandée par l'adresse (#projet-…) et y descend
+  function afficherDepuisAdresse(defiler: boolean) {
+    const cible = location.hash;
+    if (!cible.startsWith('#projet-')) return;
+    const fiche = document.querySelector<HTMLElement>(cible);
+    if (!fiche) return;
+    fiches.forEach((f) => f.toggleAttribute('data-masque', f !== fiche));
+    if (defiler) document.getElementById('etude')?.scrollIntoView({ behavior: 'smooth' });
+  }
+
+  afficherDepuisAdresse(true);
+  window.addEventListener('hashchange', () => afficherDepuisAdresse(true));
+
+  // Miniatures : changent l'image principale de la fiche
+  document.querySelectorAll<HTMLButtonElement>('[data-miniature]').forEach((miniature) => {
+    miniature.addEventListener('click', () => {
+      const fiche = miniature.closest('[data-fiche-projet]');
+      const principale = fiche?.querySelector<HTMLImageElement>('[data-image-principale]');
+      const source = miniature.querySelector<HTMLImageElement>('img')?.dataset.grande;
+      if (!fiche || !principale || !source) return;
+      principale.removeAttribute('srcset');
+      principale.src = source;
+      fiche.querySelectorAll('[data-miniature]').forEach((m) => m.setAttribute('aria-pressed', String(m === miniature)));
+    });
+  });
+</script>

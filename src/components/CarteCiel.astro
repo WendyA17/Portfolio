@@ -1,0 +1,124 @@
+---
+// ─────────────────────────────────────────────────────────────
+// Une carte du ciel : un projet présenté comme une carte illustrée.
+// Face avant : numéro, image en arche, médaillon de lune, nom.
+// Dos : description, rôle, technos et lien.
+// Elle se retourne au survol (souris), au toucher (mobile)
+// et quand on y entre au clavier (Tab).
+// ─────────────────────────────────────────────────────────────
+import { Image } from 'astro:assets';
+import type { CollectionEntry } from 'astro:content';
+import { formeEclairee, enRomain } from '../utils/Lune';
+import type { Dictionnaire } from '../i18n/utils';
+
+interface Props {
+  projet: CollectionEntry<'projets'>;
+  numero: number;            // position dans la galerie (1, 2, 3…)
+  textes: Dictionnaire['projets'];
+  favoris: string[];         // noms des technos « coups de cœur », affichées en doré
+}
+
+const { projet, numero, textes, favoris } = Astro.props;
+const p = projet.data;
+// L'identifiant du projet sans la langue : « fr/marsai » → « marsai »
+const slug = projet.id.split('/').slice(1).join('/');
+
+// Chaque carte a sa phase de lune : un cycle complet toutes les 8 cartes
+const phase = (((numero - 1) % 7) + 1) / 8;
+
+// Partie de l'image visible dans l'arche
+const cadrages = {
+  haut: 'object-top',
+  centre: 'object-center',
+  bas: 'object-bottom',
+  gauche: 'object-left',
+  droite: 'object-right',
+} as const;
+---
+
+<li data-categorie={p.categorie} class="carte-ciel group/carte relative shrink-0 snap-center perspective-[1200px] transition-opacity duration-500">
+  <div
+    class="relative aspect-[216/372] w-full transition-transform duration-700 ease-out transform-3d group-hover/carte:-translate-y-3 group-hover/carte:rotate-y-180 group-focus-within/carte:rotate-y-180 group-data-retournee/carte:rotate-y-180"
+  >
+    <!-- ── Face avant ── -->
+    <div class="absolute inset-0 flex flex-col items-center overflow-hidden rounded-2xl border border-lavande/70 bg-linear-to-b from-[#221c35] to-[#1a1629] px-5 pt-4 pb-5 text-center shadow-flottant backface-hidden">
+      <span aria-hidden="true" class="pointer-events-none absolute inset-[7px] rounded-[10px] border border-or/30"></span>
+
+      <span class="font-serif text-sm tracking-[0.2em] text-or" aria-hidden="true">{enRomain(numero)}</span>
+
+      <!-- L'image dans sa fenêtre en arche -->
+      <div class="mt-2 aspect-[176/180] w-full overflow-hidden rounded-t-full rounded-b-md border border-or/35">
+        <Image
+          src={p.couverture}
+          alt=""
+          widths={[240, 480]}
+          sizes="240px"
+          class:list={['size-full object-cover transition-transform duration-700 group-hover/carte:scale-105', cadrages[p.cadrage]]}
+        />
+      </div>
+
+      <!-- Le médaillon de lune -->
+      <span aria-hidden="true" class="relative -mt-6 flex size-12 items-center justify-center rounded-full border border-or/55 bg-nuit shadow-[0_0_16px_rgba(209,196,233,0.35)]">
+        <svg viewBox="-4 -4 108 108" class="size-7 drop-shadow-[0_0_5px_rgba(248,247,252,0.8)]">
+          <circle cx="50" cy="50" r="50" fill="#1b1729" stroke="#b8a9cb" stroke-width="4"></circle>
+          <path d={formeEclairee(phase)} fill="#f8f7fc"></path>
+        </svg>
+      </span>
+
+      <h3 class="mt-3 font-serif text-2xl leading-tight font-medium text-lune">{p.titre}</h3>
+      <p class="mt-auto text-[0.65rem] tracking-[0.22em] text-lavande-claire uppercase">
+        {textes.categories[p.categorie]} · {p.annee}
+      </p>
+      <span aria-hidden="true" class="mt-2 text-xs text-or/70">✦</span>
+
+      <!-- Bouton invisible qui couvre la carte : le toucher la retourne -->
+      <button type="button" data-retourner data-fiche={`#projet-${slug}`} aria-expanded="false" class="absolute inset-0 cursor-pointer rounded-2xl">
+        <span class="sr-only">{textes.retourner} : {p.titre}</span>
+      </button>
+    </div>
+
+    <!-- ── Dos de la carte ── -->
+    <div class="absolute inset-0 flex rotate-y-180 flex-col items-center gap-2 overflow-hidden rounded-2xl border border-argent/70 bg-linear-to-b from-[#2a2142] to-[#1a1629] px-4 pt-5 pb-4 text-center shadow-[0_0_34px_rgba(120,97,143,0.55)] backface-hidden *:shrink-0">
+      <span aria-hidden="true" class="pointer-events-none absolute inset-[7px] rounded-[10px] border border-or/30"></span>
+      <p class="font-serif text-xl leading-tight font-medium text-lune">{p.titre}</p>
+      <p class="text-[0.6rem] tracking-[0.14em] text-lavande-claire uppercase">{p.type} · {p.annee}</p>
+      <span aria-hidden="true" class="h-px w-full bg-linear-to-r from-transparent via-or/50 to-transparent"></span>
+      <p class="line-clamp-4 shrink! text-[0.8rem] leading-snug text-argent">{p.description}</p>
+      <p class="font-manuscrite text-lg leading-tight text-lune">{p.role}</p>
+      <ul class="flex flex-wrap justify-center gap-1">
+        {
+          p.technos.map((techno) =>
+            favoris.includes(techno) ? (
+              <li class="rounded-full border border-or/50 px-2 py-0.5 text-[0.65rem] text-or">✦ {techno}</li>
+            ) : (
+              <li class="rounded-full border border-bordure px-2 py-0.5 text-[0.65rem] text-argent">{techno}</li>
+            ),
+          )
+        }
+      </ul>
+      <!-- Les boutons : la fiche détaillée (phase suivante) et le site en ligne -->
+      <div class="relative z-10 mt-auto flex items-center gap-2">
+        <a
+          href={`#projet-${slug}`}
+          class="flex items-center gap-1.5 rounded-full bg-lavande px-4 py-2 text-xs font-semibold text-lune transition-colors hover:bg-lavande-vive"
+        >
+          {textes.voirFiche}
+          <span aria-hidden="true">↓</span>
+        </a>
+        {
+          p.lien && (
+            <a
+              href={p.lien}
+              target="_blank"
+              rel="noopener"
+              class="flex size-8 items-center justify-center rounded-full border border-lavande text-xs text-argent transition-colors hover:bg-lavande hover:text-lune"
+            >
+              <span aria-hidden="true">↗</span>
+              <span class="sr-only">{textes.voirSite} ({textes.nouvelOnglet})</span>
+            </a>
+          )
+        }
+      </div>
+    </div>
+  </div>
+</li>

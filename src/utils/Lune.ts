@@ -20,3 +20,20 @@ export function formeEclairee(phase: number): string {
 export function partEclairee(phase: number): number {
   return (1 - Math.cos(2 * Math.PI * phase)) / 2;
 }
+
+/** Écrit un nombre en chiffres romains : 4 → « IV » */
+export function enRomain(nombre: number): string {
+  const table: [number, string][] = [
+    [1000, 'M'], [900, 'CM'], [500, 'D'], [400, 'CD'], [100, 'C'], [90, 'XC'],
+    [50, 'L'], [40, 'XL'], [10, 'X'], [9, 'IX'], [5, 'V'], [4, 'IV'], [1, 'I'],
+  ];
+  let reste = nombre;
+  let resultat = '';
+  for (const [valeur, symbole] of table) {
+    while (reste >= valeur) {
+      resultat += symbole;
+      reste -= valeur;
+    }
+  }
+  return resultat;
+}
